@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 cd $HOME
+mkdir -p .config/bash
+pushd .config/bash
+curl https://raw.githubusercontent.com/git/git/master/contrib/completion/git-completion.bash > git.sh
+popd
 echo "installing config files"
 mkdir paperbenni
 cd paperbenni
