@@ -69,3 +69,7 @@ if [ "$PS1" ]; then
 fi
 
 source ~/.config/bash/git.sh || echo "git completion at .config/bash/git.sh not found"
+
+if command -v tmux &>/dev/null && [ -n "$PS1" ] && [[ ! "$TERM" =~ screen ]] && [[ ! "$TERM" =~ tmux ]] && [ -z "$TMUX" ]; then
+    exec tmux
+fi
