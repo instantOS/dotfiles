@@ -12,4 +12,5 @@ git clone --depth=1 https://github.com/paperbenni/dotfiles.git &>/dev/null
 cd dotfiles
 mv bashrc .bashrc
 mv .bashrc ~/
+mv tmux.conf ~/.tmux.conf
 echo "done"
