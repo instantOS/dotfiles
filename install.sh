@@ -8,6 +8,7 @@ echo "installing config files"
 mkdir paperbenni
 cd paperbenni
 rm -rf dotfiles
+echo "cloning files"
 git clone --depth=1 https://github.com/paperbenni/dotfiles.git &>/dev/null
 cd dotfiles
 mv bashrc .bashrc

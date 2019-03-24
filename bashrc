@@ -83,14 +83,11 @@ if [ -n "$PS1" ] && [[ ! "$TERM" =~ screen ]] && [[ ! "$TERM" =~ tmux ]] && [ -z
 fi
 
 tmkill() {
-	command -v fzf || return
 	LIST=$(tmux ls)
 	TSESSIONS=""
 	while read -r line; do
 		if ! echo "$line" | grep 'attached'; then
-			TSESSIONS="$TSESSIONS
-					$(echo $line | grep -oP '^\d\d?')"
+			tmux kill-session -t "$(echo $line | grep -oP '^\d\d?')"
 		fi
 	done <<<"$LIST"
-	tmux kill-session -t $(echo "$TSESSIONS" | fzf)
 }
