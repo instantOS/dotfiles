@@ -2,7 +2,10 @@
 ## paperbenni's bashrc  ##
 ##########################
 
-export "$PS1"='$'
+PS1='$(if [[ $? == 0 ]]; then echo "\[\e[32m\]:)"; else echo "\[\e[31m\]:("; fi)\[\e[0m\] \u \e[34m\w\e[0m $ '
+
+export EDITOR=nvim
+export PAGER=less
 
 # sudo complete only in interactive sessions
 if [ "$PS1" ]; then
