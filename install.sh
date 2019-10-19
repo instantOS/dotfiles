@@ -33,5 +33,6 @@ curl 'https://raw.githubusercontent.com/git/git/master/contrib/completion/git-co
 gget '.gitconfig'
 gget 'tmux.conf' '.tmux.conf'
 gget 'bashrc.sh' '.bashrc'
+gget 'compton.conf' '.compton.conf'
 
 popd
