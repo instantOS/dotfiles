@@ -1,0 +1,9 @@
+[user]
+        email = paperbenni@gmail.com
+        name = paperbenni
+[gui]
+        editor = code
+[credential]
+        helper = store
+[core]
+        editor = nvim
