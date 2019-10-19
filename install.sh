@@ -28,8 +28,7 @@ gget() {
 
 # install git completion script, source it in bashrc
 mkdir .paperbenni
-curl 'https://raw.githubusercontent.com/git/git/master/contrib/completion/git-completion.bash' \
-    .paperbenni/git.sh
+curl 'https://raw.githubusercontent.com/git/git/master/contrib/completion/git-completion.bash' >.paperbenni/git.sh
 
 gget '.gitconfig'
 gget 'tmux.conf' '.tmux.conf'
