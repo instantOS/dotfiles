@@ -35,5 +35,13 @@ gget 'tmux.conf' '.tmux.conf'
 gget 'bashrc.sh' '.bashrc'
 gget 'compton.conf' '.compton.conf'
 gget 'config.rasi' '.config/rofi/rasi.conf'
+gget 'flameshot.ini' '.config/Dharkael/flameshot.ini'
+
+# enable arch pacman easter egg
+if command -v pacman && [ -e /etc/pacman.conf ] &&
+    ! grep 'ILoveCandy' </etc/pacman; then
+    echo "pacmanifiying your pacman manager"
+    sudo sed -i '/VerbosePkgLists/a ILoveCandy' /etc/pacman.conf
+fi
 
 popd
