@@ -3,8 +3,7 @@
 ## paperbenni's bashrc  ##
 ##########################
 
-if ! [ -e ~/storage/shared ]
-then
+if ! [ -e ~/storage/shared ]; then
 	PS1='$(if [[ $? == 0 ]]; then echo "\[\e[32m\]:)"; else echo "\[\e[31m\]:("; fi)\[\e[0m\] \u \e[34m\w\e[0m $ '
 else
 	PS1='$> '
@@ -29,11 +28,14 @@ papertest() {
 
 set -o vi
 
+bind 'set show-all-if-ambiguous on'
+bind 'TAB:menu-complete'
+
 # automatically make it a tmux session
-if [ -n "$PS1" ] && \
-	[[ ! "$TERM" =~ screen ]] && \
-	[[ ! "$TERM" =~ tmux ]] && \
-	[ -z "$TMUX" ] && \
+if [ -n "$PS1" ] &&
+	[[ ! "$TERM" =~ screen ]] &&
+	[[ ! "$TERM" =~ tmux ]] &&
+	[ -z "$TMUX" ] &&
 	! [ -e ~/storage/shared ]; then
 	if command -v tmux &>/dev/null; then
 		exec tmux
@@ -51,4 +53,3 @@ tmkill() {
 		fi
 	done <<<"$LIST"
 }
-
