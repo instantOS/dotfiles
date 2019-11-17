@@ -36,6 +36,9 @@ gget 'bashrc.sh' '.bashrc'
 gget 'compton.conf' '.compton.conf'
 gget 'config.rasi' '.config/rofi/rasi.conf'
 gget 'flameshot.ini' '.config/Dharkael/flameshot.ini'
+gget 'fonts.sh'
+bash ~/fonts.sh
+rm ~/fonts.sh
 
 # enable arch pacman easter egg
 if command -v pacman && [ -e /etc/pacman.conf ] &&
