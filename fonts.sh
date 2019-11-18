@@ -8,12 +8,17 @@ mkdir .fonts
 mkdir .cache/applefonts
 
 cd .cache/applefonts
-wget https://developer.apple.com/design/downloads/SF-Font-Pro.dmg
-appledmg SF-Font-Pro.dmg
-mv SanFranciscoPro/Library/Fonts/* ~/.fonts
-rm -rf ./*
-wget https://developer.apple.com/design/downloads/SF-Mono.dmg
-appledmg SF-Mono.dmg
-mv SFMonoFonts/Library/Fonts/* ~/.fonts
+if ! ls ~/.fonts | grep -q 'SF-Pro'; then
+    wget https://developer.apple.com/design/downloads/SF-Font-Pro.dmg
+    appledmg SF-Font-Pro.dmg
+    mv SanFranciscoPro/Library/Fonts/* ~/.fonts
+    rm -rf ./*
+fi
+
+if ! ls ~/.fonts | grep -q 'SF-Mono'; then
+    wget https://developer.apple.com/design/downloads/SF-Mono.dmg
+    appledmg SF-Mono.dmg
+    mv SFMonoFonts/Library/Fonts/* ~/.fonts
+fi
 cd
-rm .cache/applefonts
+rm -rf .cache/applefonts

@@ -42,7 +42,7 @@ rm ~/fonts.sh
 
 # enable arch pacman easter egg
 if command -v pacman && [ -e /etc/pacman.conf ] &&
-    ! grep 'ILoveCandy' </etc/pacman; then
+    ! grep -q 'ILoveCandy' </etc/pacman.conf; then
     echo "pacmanifiying your pacman manager"
     sudo sed -i '/VerbosePkgLists/a ILoveCandy' /etc/pacman.conf
 fi
