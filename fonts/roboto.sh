@@ -10,6 +10,6 @@ cd roboto
 wget -O roboto.zip "https://fonts.google.com/download?family=Roboto"
 unzip roboto.zip
 rm LICENSE.txt
-roboto.zip
+rm roboto.zip
 mv ./* ~/.local/share/fonts
 popd

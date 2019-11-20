@@ -20,5 +20,6 @@ if ! convert -list font | grep -q 'SF-Mono'; then
     appledmg SF-Mono.dmg
     mv SFMonoFonts/Library/Fonts/* ~/.fonts
 fi
+
 cd
 rm -rf .cache/applefonts
