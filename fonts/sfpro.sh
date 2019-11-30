@@ -1,7 +1,7 @@
 #!/bin/bash
 
 source <(curl -Ls https://git.io/JerLG)
-pb tar
+pb unpack
 cd
 mkdir .fonts
 
