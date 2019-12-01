@@ -23,7 +23,8 @@ gget() {
     else
         TARGET="$HOME/$1"
     fi
-    curl https://raw.githubusercontent.com/paperbenni/dotfiles/master/"$1" >"$TARGET"
+    echo "installing $1"
+    curl -s https://raw.githubusercontent.com/paperbenni/dotfiles/master/"$1" >"$TARGET"
 }
 
 # install git completion script, source it in bashrc
@@ -36,6 +37,9 @@ gget 'bashrc.sh' '.bashrc'
 gget 'compton.conf' '.compton.conf'
 gget 'config.rasi' '.config/rofi/rasi.conf'
 gget 'flameshot.ini' '.config/Dharkael/flameshot.ini'
+
+gget 'ranger/rc.conf' '.config/ranger/rc.conf'
+gget 'ranger/commands.py' '.config/ranger/commands.py'
 
 # enable arch pacman easter egg
 if command -v pacman && [ -e /etc/pacman.conf ] &&
