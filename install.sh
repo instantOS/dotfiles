@@ -40,6 +40,7 @@ gget 'flameshot.ini' '.config/Dharkael/flameshot.ini'
 
 gget 'ranger/rc.conf' '.config/ranger/rc.conf'
 gget 'ranger/commands.py' '.config/ranger/commands.py'
+gget 'conky.conf' '.config/conky/conky.conf'
 
 # enable arch pacman easter egg
 if command -v pacman && [ -e /etc/pacman.conf ] &&
