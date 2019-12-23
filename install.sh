@@ -28,7 +28,7 @@ gget() {
 }
 
 # install git completion script, source it in bashrc
-mkdir .paperbenni
+mkdir .paperbenni &> /dev/null
 curl 'https://raw.githubusercontent.com/git/git/master/contrib/completion/git-completion.bash' >.paperbenni/git.sh
 
 gget '.gitconfig'
