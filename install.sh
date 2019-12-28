@@ -35,7 +35,7 @@ gget '.gitconfig'
 gget 'tmux.conf' '.tmux.conf'
 gget 'bashrc.sh' '.bashrc'
 gget 'compton.conf' '.compton.conf'
-gget 'config.rasi' '.config/rofi/rasi.conf'
+
 gget 'flameshot.ini' '.config/Dharkael/flameshot.ini'
 gget 'libinput-gestures.conf' '.config/libinput-gestures.conf'
 
