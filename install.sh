@@ -28,7 +28,7 @@ gget() {
 }
 
 # install git completion script, source it in bashrc
-mkdir .paperbenni &> /dev/null
+mkdir .paperbenni &>/dev/null
 curl 'https://raw.githubusercontent.com/git/git/master/contrib/completion/git-completion.bash' >.paperbenni/git.sh
 
 gget '.gitconfig'
@@ -37,6 +37,7 @@ gget 'bashrc.sh' '.bashrc'
 gget 'compton.conf' '.compton.conf'
 gget 'config.rasi' '.config/rofi/rasi.conf'
 gget 'flameshot.ini' '.config/Dharkael/flameshot.ini'
+gget 'libinput-gestures.conf' '.config/libinput-gestures.conf'
 
 gget 'ranger/rc.conf' '.config/ranger/rc.conf'
 gget 'ranger/commands.py' '.config/ranger/commands.py'

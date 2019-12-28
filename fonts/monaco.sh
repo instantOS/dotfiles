@@ -1,6 +1,6 @@
 #!/bin/bash
 
-convert -list font | grep -iq 'monaco.*complete' && exit
+convert -list font | grep -iq 'monaco.*complete' && (echo "monaco already found" && exit)
 
 mkdir -p ~/.local/share/fonts &>/dev/null
 
