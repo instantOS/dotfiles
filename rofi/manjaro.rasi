@@ -1,41 +1,34 @@
-/************************************************
- * ROFI Color theme
- * User: leofa
- * Copyright: 2017 leofa
- ***********************************************/
+/***************************************
+ * manjaro-i3-rofi                     *
+ * User: InsecureSpike                 *
+ * Copyright: InsecureSpike & fhdk     *
+ * Based on Manjaro-Openbox by fhdk    *
+ ***************************************/
 
 * {
-    selected-normal-foreground:  rgba ( 249, 249, 249, 100 % );
-    foreground:                  rgba ( 196, 203, 212, 100 % );
-    normal-foreground:           @foreground;
-    alternate-normal-background: rgba ( 64, 69, 82, 59 % );
-    red:                         rgba ( 220, 50, 47, 100 % );
-    selected-urgent-foreground:  rgba ( 249, 249, 249, 100 % );
-    blue:                        rgba ( 38, 139, 210, 100 % );
-    urgent-foreground:           rgba ( 204, 102, 102, 100 % );
-    alternate-urgent-background: rgba ( 75, 81, 96, 90 % );
-    active-foreground:           rgba ( 101, 172, 255, 100 % );
-    lightbg:                     rgba ( 238, 232, 213, 100 % );
-    selected-active-foreground:  rgba ( 249, 249, 249, 100 % );
-    alternate-active-background: rgba ( 75, 81, 96, 89 % );
-    background:                  rgba ( 45, 48, 59, 95 % );
-    alternate-normal-foreground: @foreground;
-    normal-background:           @background;
-    lightfg:                     rgba ( 88, 104, 117, 100 % );
-    selected-normal-background:  rgba ( 64, 132, 214, 100 % );
-    border-color:                rgba ( 124, 131, 137, 100 % );
-    spacing:                     2;
-    separatorcolor:              rgba ( 29, 31, 33, 100 % );
-    urgent-background:           rgba ( 29, 31, 33, 17 % );
-    selected-urgent-background:  rgba ( 165, 66, 66, 100 % );
-    alternate-urgent-foreground: @urgent-foreground;
-    background-color:            rgba ( 0, 0, 0, 0 % );
-    alternate-active-foreground: @active-foreground;
-    active-background:           rgba ( 29, 31, 33, 17 % );
-    selected-active-background:  rgba ( 68, 145, 237, 100 % );
+    border-color:                   rgba ( 22, 160, 133, 100 % );
+    background-color:               rgba ( 0, 0, 0, 0 % );
+    spacing:                        2;
+    separatorcolor:                 rgba ( 115, 147, 138, 100 % );
+    normal-background:              rgba ( 40, 52, 58, 100 % );
+    normal-foreground:              rgba ( 248, 248, 242, 70 % );
+    normal-background-selected:     rgba ( 30, 38, 43, 100 % );
+    normal-foreground-selected:     rgba ( 248, 248, 242, 100 % );
+    active-background:              rgba ( 40, 52, 58, 100 % );
+    active-foreground:              rgba ( 22, 160, 133, 70 % );
+    active-background-selected:     rgba ( 20, 20, 17, 100 % );
+    active-foreground-selected:     rgba ( 22, 160, 133, 100 % );
+    alternate-background:           rgba ( 40, 52, 58, 100 % );
+    alternate-foreground:           rgba ( 248, 248, 242, 70 % );
+    alternate-background-selected:  rgba ( 22, 160, 133, 100 % );
+    alternate-foreground-selected:  rgba ( 248, 248, 242, 100 % );
+    urgent-background:              rgba ( 40, 52, 58, 100 % );
+    urgent-foreground:              rgba ( 253, 214, 15, 70 % );
+    urgent-background-selected:     rgba ( 22, 160, 133, 100 % );
+    urgent-foreground-selected:     rgba ( 253, 214, 15, 100 % );
 }
 #window {
-    background-color: @background;
+    background-color: @normal-background;
     border:           1;
     padding:          5;
 }
@@ -49,7 +42,7 @@
     padding:      1px ;
 }
 #textbox {
-    text-color: @foreground;
+    text-color: @normal-foreground;
 }
 #listview {
     fixed-height: 0;
@@ -76,51 +69,46 @@
     text-color:       @active-foreground;
 }
 #element.selected.normal {
-    background-color: @selected-normal-background;
-    text-color:       @selected-normal-foreground;
+    background-color: @normal-background-selected;
+    text-color:       @normal-foreground-selected;
 }
 #element.selected.urgent {
-    background-color: @selected-urgent-background;
-    text-color:       @selected-urgent-foreground;
+    background-color: @urgent-background-selected;
+    text-color:       @urgent-foreground-selected;
 }
 #element.selected.active {
-    background-color: @selected-active-background;
-    text-color:       @selected-active-foreground;
+    background-color: @active-background-selected;
+    text-color:       @active-foreground-selected;
 }
 #element.alternate.normal {
-    background-color: @alternate-normal-background;
-    text-color:       @alternate-normal-foreground;
+    background-color: @alternate-background;
+    text-color:       @alternate-foreground;
 }
 #element.alternate.urgent {
-    background-color: @alternate-urgent-background;
-    text-color:       @alternate-urgent-foreground;
+    background-color: @urgent-background;
+    text-color:       @urgent-foreground;
 }
 #element.alternate.active {
-    background-color: @alternate-active-background;
-    text-color:       @alternate-active-foreground;
+    background-color: @active-background;
+    text-color:       @active-foreground;
 }
 #scrollbar {
     width:        4px ;
     border:       0;
-    handle-color: @normal-foreground;
     handle-width: 8px ;
     padding:      0;
 }
-#mode-switcher {
+#sidebar {
     border:       2px 0px 0px ;
     border-color: @separatorcolor;
 }
-#button {
-    spacing:    0;
-    text-color: @normal-foreground;
-}
 #button.selected {
-    background-color: @selected-normal-background;
-    text-color:       @selected-normal-foreground;
+    background-color: @normal-background-selected;
+    text-color:       @normal-foreground-selected;
 }
 #inputbar {
     spacing:    0;
-    text-color: @normal-foreground;
+    text-color: @normal-foreground-selected;
     padding:    1px ;
 }
 #case-indicator {
