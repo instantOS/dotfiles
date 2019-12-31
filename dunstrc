@@ -1,0 +1,29 @@
+[global]
+	frame_color = "#e9e9f4"
+	separator_color = "#e9e9f4"
+	geometry = "300x5-30+40"
+	frame_width = 3
+	padding = 8
+	horizontal_padding = 8
+	history_length = 1
+
+[i3blocks]
+	summary = "*"
+	urgency = normal
+	script = ~/dunst/notify
+
+[base16_low]
+	msg_urgency = low
+	background = "#626483"
+	foreground = "#e9e9f4"
+
+[base16_normal]
+	msg_urgency = normal
+	background = "#282a36"
+	foreground = "#8be9fd"
+
+[base16_critical]
+	msg_urgency = critical
+	background = "#ea51b2"
+	foreground = "#f1f2f8"
+

@@ -38,6 +38,7 @@ gget 'compton.conf' '.compton.conf'
 
 gget 'flameshot.ini' '.config/Dharkael/flameshot.ini'
 gget 'libinput-gestures.conf' '.config/libinput-gestures.conf'
+gget 'dunstrc' '.config/dunst/dunstrc'
 
 gget 'ranger/rc.conf' '.config/ranger/rc.conf'
 gget 'ranger/commands.py' '.config/ranger/commands.py'
