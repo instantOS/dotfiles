@@ -44,6 +44,8 @@ gget 'ranger/rc.conf' '.config/ranger/rc.conf'
 gget 'ranger/commands.py' '.config/ranger/commands.py'
 gget 'conky.conf' '.config/conky/conky.conf'
 
+gget 'qt5ct.conf' '/home/benjamin/.config/qt5ct/qt5ct.conf'
+
 # enable arch pacman easter egg
 if command -v pacman && [ -e /etc/pacman.conf ] &&
     ! grep -q 'ILoveCandy' </etc/pacman.conf; then
