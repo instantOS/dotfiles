@@ -7,6 +7,8 @@
 	horizontal_padding = 8
 	history_length = 1
 	corner_radius = 12
+	icon_position = left
+
 [i3blocks]
 	summary = "*"
 	urgency = normal

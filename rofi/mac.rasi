@@ -39,6 +39,7 @@
     background-color: @background;
     border:           1;
     padding:          5;
+    border-radius: 12;
 }
 #mainbox {
     border:  0;
@@ -63,6 +64,7 @@
 #element {
     border:  0;
     padding: 1px ;
+    border-radius: 12;
 }
 #element.normal.normal {
     background-color: @normal-background;

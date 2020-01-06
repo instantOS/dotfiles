@@ -37,6 +37,7 @@
 #window {
     border:           3;
     padding:          9;
+    border-radius: 12;
 }
 #mainbox {
     background-color: inherit;
@@ -49,6 +50,7 @@
 #element {
     border:  0;
     padding: 1px ;
+    border-radius: 12;
 }
 #element.normal.normal {
     background-color: @normal-background;
