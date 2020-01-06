@@ -1,7 +1,7 @@
 [global]
 	frame_color = "#e9e9f4"
 	separator_color = "#e9e9f4"
-	geometry = "300x5-30+40"
+	geometry = "500x7-30+40"
 	frame_width = 3
 	padding = 8
 	horizontal_padding = 8
