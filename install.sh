@@ -80,4 +80,8 @@ if ! grep -i 'pb-grub' </etc/default/grub && command -v nvidia-smi; then
 
 fi
 
+if ! grep -q 'instantos-general' .Xresources; then
+    curl -s "https://raw.githubusercontent.com/paperbenni/dotfiles/master/" >>~/.Xresources
+fi
+
 popd
