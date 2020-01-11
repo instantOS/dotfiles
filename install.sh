@@ -2,6 +2,7 @@
 
 ######################################################
 ## installs all basic dotfiles for paperbenni setup ##
+## please install theme before this                 ##
 ######################################################
 
 pushd .
@@ -25,6 +26,31 @@ gget() {
     fi
     echo "installing $1"
     curl -s https://raw.githubusercontent.com/paperbenni/dotfiles/master/"$1" >"$TARGET"
+}
+
+gappend() {
+    if [ -n "$2" ]; then
+        if echo $2 | grep '/'; then
+            ARGDIR=${2%/*}
+            echo "creating dir $ARGDIR"
+            if ! [ -e "$ARGDIR" ]; then
+                mkdir -p "$ARGDIR" || (echo 'cannot create dir' && return 1)
+            fi
+            TARGET="$2"
+        else
+            TARGET="$HOME/$2"
+        fi
+    else
+        TARGET="$HOME/$1"
+    fi
+    echo "installing $1"
+    if [ -e $TARGET ] && grep -q "papertheme" "$TARGET"; then
+        if ! grep -q "$3" "$TARGET"; then
+            curl -s https://raw.githubusercontent.com/paperbenni/dotfiles/master/"$1" >>"$TARGET"
+        fi
+    else
+        curl -s https://raw.githubusercontent.com/paperbenni/dotfiles/master/"$1" >"$TARGET"
+    fi
 }
 
 # install git completion script, source it in bashrc
@@ -80,8 +106,7 @@ if ! grep -i 'pb-grub' </etc/default/grub && command -v nvidia-smi; then
 
 fi
 
-if ! grep -q 'instantos-general' .Xresources; then
-    curl -s "https://raw.githubusercontent.com/paperbenni/dotfiles/master/" >>~/.Xresources
-fi
+gappend Xresources .Xresources 'instantos-general'
+gappend dunstrc .config/dunst/dunstrc '[global]'
 
 popd
