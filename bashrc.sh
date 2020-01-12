@@ -40,14 +40,8 @@ shopt -s checkwinsize
 export EDITOR=nvim
 export PAGER=less
 
-# sudo complete only in interactive sessions
-if [ "$PS1" ]; then
-	complete -cf sudo
-
-	# default git completion from git github
-	source ~/.paperbenni/git.sh || echo "git completion not found"
-
-fi
+complete -cf sudo
+source ~/.paperbenni/git.sh || echo "git completion not found"
 
 # quickly start paperbash
 papertest() {
