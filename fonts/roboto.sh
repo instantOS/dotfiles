@@ -7,7 +7,7 @@ pushd .
 cd /tmp
 mkdir roboto
 cd roboto
-wget -O roboto.zip "https://fonts.google.com/download?family=Roboto"
+wget -qO roboto.zip "https://fonts.google.com/download?family=Roboto"
 unzip roboto.zip
 rm LICENSE.txt
 rm roboto.zip

@@ -7,7 +7,7 @@ pushd .
 cd /tmp
 mkdir cantarell
 cd cantarell
-wget -O cantarell.zip "https://fonts.google.com/download?family=Cantarell"
+wget -qO cantarell.zip "https://fonts.google.com/download?family=Cantarell"
 unzip cantarell.zip
 rm LICENSE.txt
 rm cantarell.zip

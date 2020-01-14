@@ -4,8 +4,10 @@
 ## installs all basic dotfiles for instantOS      ##
 ## please install the preferred theme before this ##
 ###################################################
+echo ""
+echo "installing dotfiles for $(whoami)"
+echo ""
 
-pushd .
 cd
 
 # fetch and install config file from my repo
@@ -74,5 +76,3 @@ gget 'qt5ct.conf' '/home/benjamin/.config/qt5ct/qt5ct.conf'
 
 gappend Xresources .Xresources 'instantos-general'
 gappend dunstrc .config/dunst/dunstrc '[global]'
-
-popd
