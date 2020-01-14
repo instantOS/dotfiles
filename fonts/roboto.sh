@@ -3,7 +3,6 @@
 convert -list font | grep -iq 'roboto' && exit
 mkdir -p ~/.local/share/fonts &>/dev/null
 
-pushd .
 cd /tmp
 mkdir roboto
 cd roboto
@@ -12,4 +11,3 @@ unzip roboto.zip
 rm LICENSE.txt
 rm roboto.zip
 mv ./* ~/.local/share/fonts
-popd

@@ -3,7 +3,6 @@
 convert -list font | grep -iq 'cantarell' && exit
 mkdir -p ~/.local/share/fonts &>/dev/null
 
-pushd .
 cd /tmp
 mkdir cantarell
 cd cantarell
@@ -12,4 +11,3 @@ unzip cantarell.zip
 rm LICENSE.txt
 rm cantarell.zip
 mv ./* ~/.local/share/fonts
-popd

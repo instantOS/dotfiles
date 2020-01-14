@@ -6,9 +6,10 @@
 ###################################################
 echo ""
 echo "installing dotfiles for $(whoami)"
-echo ""
-
 cd
+pwd
+echo "HOME $HOME"
+echo ""
 
 # fetch and install config file from my repo
 gget() {
@@ -72,7 +73,7 @@ gget 'ranger/rc.conf' '.config/ranger/rc.conf'
 gget 'ranger/commands.py' '.config/ranger/commands.py'
 gget 'conky.conf' '.config/conky/conky.conf'
 
-gget 'qt5ct.conf' '/home/benjamin/.config/qt5ct/qt5ct.conf'
+gget 'qt5ct.conf' '.config/qt5ct/qt5ct.conf'
 
 gappend Xresources .Xresources 'instantos-general'
 gappend dunstrc .config/dunst/dunstrc '[global]'
