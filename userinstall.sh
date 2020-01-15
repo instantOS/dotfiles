@@ -16,8 +16,8 @@ gget() {
     if [ -n "$2" ]; then
         if echo $2 | grep '/'; then
             ARGDIR=${2%/*}
-            echo "creating dir $ARGDIR"
             if ! [ -e "$ARGDIR" ]; then
+                echo "creating dir $ARGDIR"
                 mkdir -p "$ARGDIR" || (echo 'cannot create dir' && return 1)
             fi
             TARGET="$2"
@@ -35,8 +35,8 @@ gappend() {
     if [ -n "$2" ]; then
         if echo $2 | grep '/'; then
             ARGDIR=${2%/*}
-            echo "creating dir $ARGDIR"
             if ! [ -e "$ARGDIR" ]; then
+                echo "creating dir $ARGDIR"
                 mkdir -p "$ARGDIR" || (echo 'cannot create dir' && return 1)
             fi
             TARGET="$2"
