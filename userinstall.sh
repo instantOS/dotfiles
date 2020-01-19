@@ -67,12 +67,12 @@ gappend() {
 
 # install git completion script, source it in bashrc
 mkdir .paperbenni &>/dev/null
-curl 'https://raw.githubusercontent.com/git/git/master/contrib/completion/git-completion.bash' >.paperbenni/git.sh
+curl -s 'https://raw.githubusercontent.com/git/git/master/contrib/completion/git-completion.bash' >.paperbenni/git.sh
 
 rm -rf /tmp/paperdotfiles
 mkdir -p /tmp/paperdotfiles
 cd /tmp/paperdotfiles
-git clone --depth=1 https://github.com/paperbenni/dotfiles.git
+git clone --depth=1 https://github.com/paperbenni/dotfiles.git &>/dev/null
 cd dotfiles
 
 gget '.gitconfig'
@@ -86,6 +86,7 @@ gget 'dunstrc' '.config/dunst/dunstrc'
 
 gget 'ranger/rc.conf' '.config/ranger/rc.conf'
 gget 'ranger/commands.py' '.config/ranger/commands.py'
+chmod +x .config/ranger/commands.py
 gget 'conky.conf' '.config/conky/conky.conf'
 
 gget 'qt5ct.conf' '.config/qt5ct/qt5ct.conf'
@@ -94,4 +95,4 @@ gappend Xresources .Xresources 'instantos-general'
 gappend dunstrc .config/dunst/dunstrc '[global]'
 
 cd ..
-rm -rf dotfiles
+rm -rf /tmp/paperdotfiles
