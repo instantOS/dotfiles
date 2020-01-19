@@ -28,7 +28,11 @@ gget() {
         TARGET="$HOME/$1"
     fi
     echo "installing $1"
-    curl -s https://raw.githubusercontent.com/paperbenni/dotfiles/master/"$1" >"$TARGET"
+    if [ -e ./$1 ]; then
+        cat "$1" >"$TARGET"
+    else
+        curl -s https://raw.githubusercontent.com/paperbenni/dotfiles/master/"$1" >"$TARGET"
+    fi
 }
 
 gappend() {
@@ -49,16 +53,29 @@ gappend() {
     echo "installing $1"
     if [ -e $TARGET ] && grep -q "papertheme" "$TARGET"; then
         if ! grep -q "$3" "$TARGET"; then
-            curl -s https://raw.githubusercontent.com/paperbenni/dotfiles/master/"$1" >>"$TARGET"
+            if [ -e ./$1 ]; then
+                cat "$1" >>"$TARGET"
+            else
+                curl -s https://raw.githubusercontent.com/paperbenni/dotfiles/master/"$1" >>"$TARGET"
+            fi
         fi
     else
-        curl -s https://raw.githubusercontent.com/paperbenni/dotfiles/master/"$1" >"$TARGET"
+        if [ -e ./$1 ]; then
+            cat "$1" >"$TARGET"
+        else
+            curl -s https://raw.githubusercontent.com/paperbenni/dotfiles/master/"$1" >"$TARGET"
+        fi
     fi
 }
 
 # install git completion script, source it in bashrc
 mkdir .paperbenni &>/dev/null
 curl 'https://raw.githubusercontent.com/git/git/master/contrib/completion/git-completion.bash' >.paperbenni/git.sh
+
+mkdir -p /tmp/paperdotfiles
+cd /tmp/paperdotfiles
+git clone --depth=1 https://github.com/paperbenni/dotfiles.git
+cd dotfiles
 
 gget '.gitconfig'
 gget 'tmux.conf' '.tmux.conf'
@@ -77,3 +94,6 @@ gget 'qt5ct.conf' '.config/qt5ct/qt5ct.conf'
 
 gappend Xresources .Xresources 'instantos-general'
 gappend dunstrc .config/dunst/dunstrc '[global]'
+
+cd ..
+rm -rf dotfiles
