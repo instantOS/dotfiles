@@ -14,16 +14,15 @@ echo ""
 # fetch and install config file from my repo
 gget() {
     if [ -n "$2" ]; then
-        if echo $2 | grep '/'; then
+        if echo $2 | grep -q '/'; then
             ARGDIR=${2%/*}
             if ! [ -e "$ARGDIR" ]; then
                 echo "creating dir $ARGDIR"
                 mkdir -p "$ARGDIR" || (echo 'cannot create dir' && return 1)
             fi
-            TARGET="$2"
-        else
-            TARGET="$HOME/$2"
         fi
+        TARGET="$HOME/$2"
+
     else
         TARGET="$HOME/$1"
     fi
@@ -37,16 +36,14 @@ gget() {
 
 gappend() {
     if [ -n "$2" ]; then
-        if echo $2 | grep '/'; then
+        if echo $2 | grep -q '/'; then
             ARGDIR=${2%/*}
             if ! [ -e "$ARGDIR" ]; then
                 echo "creating dir $ARGDIR"
                 mkdir -p "$ARGDIR" || (echo 'cannot create dir' && return 1)
             fi
-            TARGET="$2"
-        else
-            TARGET="$HOME/$2"
         fi
+        TARGET="$HOME/$2"
     else
         TARGET="$HOME/$1"
     fi
@@ -72,6 +69,7 @@ gappend() {
 mkdir .paperbenni &>/dev/null
 curl 'https://raw.githubusercontent.com/git/git/master/contrib/completion/git-completion.bash' >.paperbenni/git.sh
 
+rm -rf /tmp/paperdotfiles
 mkdir -p /tmp/paperdotfiles
 cd /tmp/paperdotfiles
 git clone --depth=1 https://github.com/paperbenni/dotfiles.git
