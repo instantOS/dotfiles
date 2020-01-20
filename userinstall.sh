@@ -15,7 +15,7 @@ echo ""
 gget() {
     if [ -n "$2" ]; then
         if echo $2 | grep -q '/'; then
-            ARGDIR=${2%/*}
+            ARGDIR=$HOME/${2%/*}
             if ! [ -e "$ARGDIR" ]; then
                 echo "creating dir $ARGDIR"
                 mkdir -p "$ARGDIR" || (echo 'cannot create dir' && return 1)
@@ -86,7 +86,7 @@ gget 'dunstrc' '.config/dunst/dunstrc'
 
 gget 'ranger/rc.conf' '.config/ranger/rc.conf'
 gget 'ranger/commands.py' '.config/ranger/commands.py'
-chmod +x .config/ranger/commands.py
+chmod +x ~/.config/ranger/commands.py
 gget 'conky.conf' '.config/conky/conky.conf'
 
 gget 'qt5ct.conf' '.config/qt5ct/qt5ct.conf'

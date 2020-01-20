@@ -1,5 +1,5 @@
 #!/bin/bash
-
+echo "installing source code pro"
 convert -list font | grep -iq 'source.*code' && exit
 mkdir -p ~/.local/share/fonts &>/dev/null
 

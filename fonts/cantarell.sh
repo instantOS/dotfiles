@@ -1,5 +1,6 @@
 #!/bin/bash
 
+echo "installing cantarell font"
 convert -list font | grep -iq 'cantarell' && exit
 mkdir -p ~/.local/share/fonts &>/dev/null
 

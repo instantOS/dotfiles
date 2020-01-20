@@ -1,5 +1,6 @@
 #!/bin/bash
 
+echo "installing roboto"
 convert -list font | grep -iq 'roboto' && exit
 mkdir -p ~/.local/share/fonts &>/dev/null
 
