@@ -80,6 +80,14 @@ sl() {
 	sll
 }
 
+# quick way to run instantOS utils
+i() {
+	"instant$@"
+}
+
 if [ -f /etc/bash_completion ] && ! shopt -oq posix; then
 	. /etc/bash_completion
 fi
+
+# autojump j function
+[ -e /usr/share/autojump/autojump.bash ] && source /usr/share/autojump/autojump.bash
