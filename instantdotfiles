@@ -1,0 +1,30 @@
+#!/bin/bash
+
+echo "installing dotfiles for instantOS"
+
+# run script as every user with a home directory
+userrun() {
+    REALUSERS="$(ls /home/ | grep -v '+')"
+    for i in $REALUSERS; do
+        echo "processing user $i"
+        sudo su "$i" -c "$1"
+    done
+}
+
+rootdotfiles() {
+    cd /usr/share/instantdotfiles
+    sudo ./rootinstall.sh
+    cd /usr/share/instantdotfiles
+    userrun userinstall.sh
+}
+
+userdotfiles() {
+    cd /usr/share/instantdotfiles
+    ./userinstall.sh
+}
+
+if [ -z "$1" ]; then
+    userdotfiles
+else
+    rootdotfiles
+fi
