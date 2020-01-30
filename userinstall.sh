@@ -4,6 +4,11 @@
 ## installs all basic dotfiles for instantOS      ##
 ## please install the preferred theme before this ##
 ###################################################
+SCRIPTPATH="$(
+    cd "$(dirname "$0")" >/dev/null 2>&1
+    pwd -P
+)"
+
 echo ""
 echo "installing dotfiles for $(whoami)"
 cd
@@ -67,15 +72,20 @@ gappend() {
 
 # install git completion script, source it in bashrc
 mkdir .paperbenni &>/dev/null
-curl -s 'https://raw.githubusercontent.com/git/git/master/contrib/completion/git-completion.bash' >.paperbenni/git.sh
 
-rm -rf /tmp/paperdotfiles
-mkdir -p /tmp/paperdotfiles
-cd /tmp/paperdotfiles
-git clone --depth=1 https://github.com/paperbenni/dotfiles.git &>/dev/null
-cd dotfiles
+if [ -e "$SCRIPTPATH/rootinstall.sh" ]; then
+    cd "$SCRIPTPATH"
+    echo "offline dotfiles found"
+else
+    rm -rf /tmp/paperdotfiles
+    mkdir -p /tmp/paperdotfiles
+    cd /tmp/paperdotfiles
+    git clone --depth=1 https://github.com/paperbenni/dotfiles.git &>/dev/null
+    cd dotfiles
+fi
 
 gget '.gitconfig'
+gget 'git-completion.bash' .paperbenni/git.sh
 gget 'tmux.conf' '.tmux.conf'
 gget 'bashrc.sh' '.bashrc'
 gget 'compton.conf' '.compton.conf'

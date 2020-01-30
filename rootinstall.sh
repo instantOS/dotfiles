@@ -17,16 +17,8 @@ if command -v pacman && [ -e /etc/pacman.conf ] &&
 fi
 
 # fix/improve grub settings on nvidia
-# and install a theme
+# also fixes tty resolution
 if ! grep -i 'pb-grub' </etc/default/grub && command -v nvidia-smi; then
-    echo "installing grub theme"
-    cd /tmp
-    git clone --depth=1 https://github.com/paperbenni/grub.git
-    rm -rf grub/.git
-    mv grub /boot/grub/themes/pb-grub
-    sed -i 's~#GRUB_THEME="/path/to/gfxtheme"~GRUB_THEME=/boot/grub/themes/pb-grub/theme.txt~g' /etc/default/grub
-    sed -i 's~GRUB_TIMEOUT=[0-9]*~GRUB_TIMEOUT=4~g' /etc/default/grub
-
     RESOLUTION=$(xrandr | grep -oP '[0-9]{3,4}x[0-9]{3,4}' | head -1)
 
     if [ -n "$RESOLUTION" ]; then
