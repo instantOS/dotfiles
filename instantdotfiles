@@ -24,7 +24,13 @@ userdotfiles() {
 }
 
 if [ -z "$1" ]; then
+    echo "single user dotfiles install"
     userdotfiles
 else
-    rootdotfiles
+    if [ -e /usr/share/instantdotfiles/$1.sh ]; then
+        echo "instantOS font installer"
+        /usr/share/instantdotfiles/$1.sh
+    else
+        rootdotfiles
+    fi
 fi
