@@ -16,6 +16,8 @@ pwd
 echo "HOME $HOME"
 echo ""
 
+mkdir ~/instantos
+
 # fetch and install config file from my repo
 gget() {
     if [ -n "$2" ]; then
