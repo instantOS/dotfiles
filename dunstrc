@@ -12,5 +12,5 @@
 [i3blocks]
 	summary = "*"
 	urgency = normal
-	script = ~/instantos/notifications/dunsttrigger
+	script = /usr/bin/dunsttrigger
 
