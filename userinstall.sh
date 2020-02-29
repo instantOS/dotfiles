@@ -101,6 +101,9 @@ gget 'ranger/commands.py' '.config/ranger/commands.py'
 chmod +x ~/.config/ranger/commands.py
 gget 'conky.conf' '.config/conky/conky.conf'
 
+gget 'jgmenu/jgmenurc' '.config/jgmenu/jgmenurc'
+gget 'jgmenu/prepend.csv' '.config/jgmenu/prepend.csv'
+
 gget 'qt5ct.conf' '.config/qt5ct/qt5ct.conf'
 
 gappend Xresources .Xresources 'instantos-general'
