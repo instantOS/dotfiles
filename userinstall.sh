@@ -108,6 +108,8 @@ gget 'qt5ct.conf' '.config/qt5ct/qt5ct.conf'
 
 gget 'texstudio.ini' '.config/texstudio/texstudio.ini'
 
+gget 'init.vim' '.config/nvim/init.vim'
+
 gappend Xresources .Xresources 'instantos-general'
 gappend dunstrc .config/dunst/dunstrc '[global]'
 
