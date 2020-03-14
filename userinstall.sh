@@ -110,6 +110,8 @@ gget 'texstudio.ini' '.config/texstudio/texstudio.ini'
 
 gget 'init.vim' '.config/nvim/init.vim'
 
+gget 'dmrc' '.dmrc'
+
 gappend Xresources .Xresources 'instantos-general'
 gappend dunstrc .config/dunst/dunstrc '[global]'
 
