@@ -1,10 +1,10 @@
 [Desktop Entry]
 Type=Application
 Name=Spottoggle
-GenericName=Music Player
+GenericName=Music Pause
 Icon=spotify-client
 TryExec=spoticli
-Exec=spotify %U
+Exec=spoticli
 Terminal=false
 MimeType=x-scheme-handler/spotify;
 Categories=Audio;Music;Player;AudioVideo;
