@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Network Settings
+GenericName=nm-applet
+Icon=wifi-radar
+TryExec=nm-applet
+Exec=nm-applet
+Terminal=false
