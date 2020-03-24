@@ -1,5 +1,5 @@
 configuration {
-    font:                           "SF Pro Text Regular 9";
+    font:                           "Cantarell Regular 13";
     show-icons:                     true;
     drun-display-format:            "{name}";
     fullscreen:                     false;
@@ -41,7 +41,7 @@ inputbar {
     background-color:               @background-alt;
     text-color:                     @foreground;
     expand:                         false;
-    margin:                         0px 405px 0px 405px;
+    margin:                         0px 20% 0px 20%;
     padding:                        10px 10px 10px 10px;
     position:                       north;
 }
@@ -77,7 +77,7 @@ mainbox {
     background-color:               @background-color;
     children:                       [ inputbar, listview ];
     spacing:                        25px;
-    padding:                        45px 135px 45px 135px;
+    padding:                        45px 5% 45px 5%;
 }
 
 
@@ -89,7 +89,7 @@ element {
 }
 
 element-icon {
-    size:                           128px;
+    size:                           10%;
 }
 
 element-text {
