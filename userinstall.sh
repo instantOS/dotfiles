@@ -112,6 +112,10 @@ gget 'init.vim' '.config/nvim/init.vim'
 
 gget 'dmrc' '.dmrc'
 
+gget 'desktop/terminal.desktop' '.local/share/file-manager/actions/terminal.desktop'
+gget 'desktop/spottoggle.desktop' '.local/share/applications/spottoggle.desktop'
+gget 'desktop/nm-applet.desktop' '.local/share/applications/nm-applet.desktop'
+
 gappend Xresources .Xresources 'instantos-general'
 gappend dunstrc .config/dunst/dunstrc '[global]'
 
