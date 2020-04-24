@@ -123,3 +123,10 @@ gappend dunstrc .config/dunst/dunstrc '[global]'
 
 cd ..
 rm -rf /tmp/paperdotfiles
+
+# generate override config
+if ! [ -e ~/.instantrc ]; then
+    if [ -e /usr/share/instantdotfiles/override.sh ]; then
+        bash /usr/share/instantdotfiles/override.sh
+    fi
+fi
