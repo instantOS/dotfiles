@@ -33,6 +33,19 @@ gget() {
     else
         TARGET="$HOME/$1"
     fi
+
+    if [ -e ~/.instantrc ]; then
+        if ! grep -q "$TARGET" ~/.instantrc; then
+            echo "$TARGET 1" >>~/.instantrc
+            echo "initializing config for $TARGET"
+        else
+            if grep "^$TARGET 0" ~/.instantrc; then
+                echo "skipping $TARGET, management disabled by user"
+                return
+            fi
+        fi
+    fi
+
     echo "installing $1"
     if [ -e ./$1 ]; then
         cat "$1" >"$TARGET"
@@ -86,6 +99,13 @@ else
     cd dotfiles
 fi
 
+# generate override config
+if ! [ -e ~/.instantrc ]; then
+    if [ -e /usr/share/instantdotfiles/override.sh ]; then
+        bash /usr/share/instantdotfiles/override.sh
+    fi
+fi
+
 gget '.gitconfig'
 gget 'git-completion.bash' .paperbenni/git.sh
 gget 'tmux.conf' '.tmux.conf'
@@ -123,10 +143,3 @@ gappend dunstrc .config/dunst/dunstrc '[global]'
 
 cd ..
 rm -rf /tmp/paperdotfiles
-
-# generate override config
-if ! [ -e ~/.instantrc ]; then
-    if [ -e /usr/share/instantdotfiles/override.sh ]; then
-        bash /usr/share/instantdotfiles/override.sh
-    fi
-fi

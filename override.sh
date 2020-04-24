@@ -2,18 +2,11 @@
 echo "" >~/.instantrc
 
 cat <<EOT >>~/.instantrc
-# 1 at the end of a line means the file is managed by instantOS
-# 0 means it can be overridden by the user
+# This config file allows you to configure dotfile management 
+# If you do dotfiles, you're probably okay with vim and plaintext. 
+# If you're not, you probably stumbled upon this by accident and should close this window. 
+
+# 1 at the end of a line means the file is managed and updated by instantOS
+# 0 means it is managed by the user
 
 EOT
-
-# give option to manually override dotfiles
-cat "/usr/share/instantdotfiles/userinstall.sh" |
-    grep "^gg.* .* .*" |
-    grep -o '[^ ]*$' | grep -o "[^']*" |
-    sed 's/\(.*\)/\1 1/g' >~/.instantrc
-
-cat "/usr/share/instantdotfiles/userinstall.sh" |
-    grep "^ga.* .* .*" |
-    sed 's/gappend .* \([^ ]*\) .*/\1/g' |
-    sed 's/\(.*\)/\1 1/g' >>~/.instantrc
