@@ -38,7 +38,7 @@
 #window {
     background-color: @background;
     border:           1;
-    padding:          5;
+    padding:          10;
     border-radius:    12;
 }
 #mainbox {
@@ -57,14 +57,14 @@
     fixed-height: 0;
     border:       2px 0px 0px ;
     border-color: @separatorcolor;
-    spacing:      2px ;
+    spacing:      5px ;
     scrollbar:    true;
     padding:      2px 0px 0px ;
 }
 #element {
     border:  0;
-    padding: 1px ;
-    border-radius: 12;
+    padding: 4px 4px 6px 10px ;
+    border-radius: 20;
 }
 #element.normal.normal {
     background-color: @normal-background;
@@ -124,7 +124,7 @@
 #inputbar {
     spacing:    0;
     text-color: @normal-foreground;
-    padding:    1px ;
+    padding:    10px ;
 }
 #case-indicator {
     spacing:    0;
