@@ -2,6 +2,26 @@
 
 echo "installing dotfiles for instantOS"
 
+# don't run if newest version is already installed
+if [ -n "$1" ] && [ "$1" = "-f" ]; then
+    echo "forced run"
+    shift 1
+else
+    if [ -e /usr/share/instantdotfiles/versionhash ]; then
+        if [ -e ~/.config/instantdotfiles/versionhash ]; then
+            OLDHASH="$(cat /usr/share/instantdotfiles/versionhash)"
+            NEWHASH="$(cat ~/.config/instantdotfiles/versionhash)"
+            if [ "$OLDHASH" = "$NEWHASH" ]; then
+                echo "newest dotfiles already installed"
+                exit
+            fi
+        else
+            mkdir -p ~/.config/instantdotfiles
+            cat /usr/share/instantdotfiles/versionhash >~/.config/instantdotfiles/versionhash
+        fi
+    fi
+fi
+
 # run script as every user with a home directory
 userrun() {
     REALUSERS="$(ls /home/ | grep -v '+')"
