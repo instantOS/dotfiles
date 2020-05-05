@@ -14,6 +14,8 @@ else
             if [ "$OLDHASH" = "$NEWHASH" ]; then
                 echo "newest dotfiles already installed"
                 exit
+            else
+                cat /usr/share/instantdotfiles/versionhash >~/.config/instantdotfiles/versionhash
             fi
         else
             mkdir -p ~/.config/instantdotfiles
