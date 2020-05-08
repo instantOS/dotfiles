@@ -16,6 +16,10 @@ if command -v pacman && [ -e /etc/pacman.conf ] &&
     sed -i '/VerbosePkgLists/a ILoveCandy' /etc/pacman.conf
 fi
 
+# change greeter appearance
+[ -e /etc/lightdm ] || mkdir -p /etc/lightdm
+cat /usr/share/instantdotfiles/lightdm-gtk-greeter.conf >/etc/lightdm/lightdm-gtk-greeter.conf
+
 # fix/improve grub settings on nvidia
 # also fixes tty resolution
 if ! grep -i 'pb-grub' </etc/default/grub && command -v nvidia-smi; then
