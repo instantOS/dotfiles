@@ -52,6 +52,7 @@ else
         echo "instantOS font installer"
         /usr/share/instantdotfiles/$1.sh
     else
+        echo "root dotfiles"
         rootdotfiles
     fi
 fi
