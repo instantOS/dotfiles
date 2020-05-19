@@ -19,7 +19,7 @@ TargetToolbar=true
 Enabled = true
 
 [X-Action-Profile profile-zero]
-Exec=urxvt -cd %f
+Exec=urxvt -e sh -c "cd %f; zsh"
 MimeTypes=inode/directory;
 Name[en_US]=Default profile
 Name[en]=Default profile
