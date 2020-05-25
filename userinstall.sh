@@ -29,9 +29,10 @@ gget() {
             fi
         fi
         TARGET="$HOME/$2"
-
+        TARGETNAME="$2"
     else
         TARGET="$HOME/$1"
+        TARGETNAME="$1"
     fi
 
     if [ -e ~/.instantrc ]; then
@@ -44,6 +45,15 @@ gget() {
                 return
             fi
         fi
+    fi
+
+    # back up old version of dotfiles
+    if [ -e "$TARGET" ]; then
+        echo "archiving old version of $TARGET"
+        DOTDATE="$(date '+%Y%m%d%H%M')"
+        [ -e ~/instantos/olddotfiles ] || mkdir -p ~/instantos/olddotfiles/"$DOTDATE"
+        cat "$TARGET" >~/instantos/olddotfiles/"$DOTDATE"/"$TARGETNAME"
+        echo "$TARGET" >>~/instantos/olddotfiles/"$DOTDATE"/index
     fi
 
     echo "installing $1"
@@ -67,6 +77,15 @@ gappend() {
     else
         TARGET="$HOME/$1"
     fi
+
+    if [ -e "$TARGET" ]; then
+        echo "archiving old version of $TARGET"
+        DOTDATE="$(date '+%Y%m%d%H%M')"
+        [ -e ~/instantos/olddotfiles ] || mkdir -p ~/instantos/olddotfiles/"$DOTDATE"
+        cat "$TARGET" >~/instantos/olddotfiles/"$DOTDATE"/"$TARGETNAME"
+        echo "$TARGET" >>~/instantos/olddotfiles/"$DOTDATE"/index
+    fi
+
     echo "installing $1"
     if [ -e $TARGET ] && grep -q "papertheme" "$TARGET"; then
         if ! grep -q "$3" "$TARGET"; then
@@ -106,7 +125,6 @@ if ! [ -e ~/.instantrc ]; then
     fi
 fi
 
-gget '.gitconfig'
 gget 'git-completion.bash' .paperbenni/git.sh
 gget 'tmux.conf' '.tmux.conf'
 gget 'bashrc.sh' '.bashrc'
