@@ -7,6 +7,13 @@ if [ -n "$1" ] && [ "$1" = "-f" ]; then
     echo "forced run"
     shift 1
 else
+
+    # for use on other distros
+    if iconf -i nodotfiles; then
+        echo "instantdotfiles disabled"
+        exit
+    fi
+
     if [ -e /usr/share/instantdotfiles/versionhash ]; then
         if [ -e ~/.config/instantdotfiles/versionhash ]; then
             OLDHASH="$(cat /usr/share/instantdotfiles/versionhash)"
@@ -18,7 +25,7 @@ else
                 cat /usr/share/instantdotfiles/versionhash >~/.config/instantdotfiles/versionhash
             fi
         else
-            mkdir -p ~/.config/instantdotfiles
+            mkdir -p ~/.config/instantdotfiles &>/dev/null
             cat /usr/share/instantdotfiles/versionhash >~/.config/instantdotfiles/versionhash
         fi
     fi

@@ -4,6 +4,14 @@
 ## installs all basic dotfiles for instantOS      ##
 ## please install the preferred theme before this ##
 ###################################################
+
+# root check
+if whoami | grep -q '^root$'; then
+    echo "do not run instantdotfiles as root"
+    echo "do not run instantdotfiles as root $(date)" >/opt/instantdotfileslog
+    exit
+fi
+
 SCRIPTPATH="$(
     cd "$(dirname "$0")" >/dev/null 2>&1
     pwd -P
@@ -70,7 +78,7 @@ gappend() {
             ARGDIR=${2%/*}
             if ! [ -e "$ARGDIR" ]; then
                 echo "creating dir $ARGDIR"
-                mkdir -p "$ARGDIR" || (echo 'cannot create dir' && return 1)
+                mkdir -p "$ARGDIR" || (pwd && echo "cannot create dir $ARGDIR" && return 1)
             fi
         fi
         TARGET="$HOME/$2"
@@ -156,8 +164,8 @@ gget 'desktop/nm-applet.desktop' '.local/share/applications/nm-applet.desktop'
 
 gget 'neofetch.conf' '.config/neofetch/config.conf'
 
-gappend Xresources .Xresources 'instantos-general'
-gappend dunstrc .config/dunst/dunstrc '[global]'
+gappend Xresources '.Xresources' 'instantos-general'
+gappend dunstrc '~/.config/dunst/dunstrc' '[global]'
 
 cd ..
 rm -rf /tmp/paperdotfiles
