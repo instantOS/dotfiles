@@ -153,6 +153,7 @@ gget 'jgmenu/prepend.csv' '.config/jgmenu/prepend.csv'
 gget 'qt5ct.conf' '.config/qt5ct/qt5ct.conf'
 
 gget 'texstudio.ini' '.config/texstudio/texstudio.ini'
+gget 'instantosonboard.theme' '.local/share/onboard/themes/instantosonboard.theme'
 
 gget 'init.vim' '.config/nvim/init.vim'
 
