@@ -41,7 +41,7 @@ backupfile() {
         echo "archiving old version of $2"
         DOTDATE="$(date '+%Y%m%d%H%M')"
 
-        touch instantos/olddotfiles/"$DOTDATE"/index || {
+        touch ~/instantos/olddotfiles/"$DOTDATE"/index || {
             echo "dotfiles installation failed"
             exit
         }
