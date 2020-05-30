@@ -87,11 +87,20 @@ gappend() {
     fi
 
     if [ -e "$TARGET" ]; then
-        echo "archiving old version of $TARGET"
         DOTDATE="$(date '+%Y%m%d%H%M')"
-        [ -e ~/instantos/olddotfiles ] || mkdir -p ~/instantos/olddotfiles/"$DOTDATE"
-        cat "$TARGET" >~/instantos/olddotfiles/"$DOTDATE"/"$TARGETNAME"
-        echo "$TARGET" >>~/instantos/olddotfiles/"$DOTDATE"/index
+        [ -e ~/instantos/olddotfiles/"$DOTDATE" ] || mkdir -p ~/instantos/olddotfiles/"$DOTDATE"
+
+        ctee() {
+            mkdir -p ${1%/*} && command tee "$@"
+        }
+
+        if [ -e "$TARGET" ]; then
+            echo "archiving old version of $TARGET"
+            cat "$TARGET" | ctee ~/instantos/olddotfiles/"$DOTDATE"/"$TARGETNAME"
+            echo "$TARGET" >>~/instantos/olddotfiles/"$DOTDATE"/index
+        else
+            echo "cannot archive $TARGET, no old version found"
+        fi
     fi
 
     echo "installing $1"
