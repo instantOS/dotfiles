@@ -24,25 +24,30 @@ pwd
 echo "HOME $HOME"
 echo ""
 
-mkdir ~/instantos
+mkdir -p ~/instantos/olddotfiles &>/dev/null
 
 ctee() {
     mkdir -p ${1%/*} && command tee "$@"
 }
 
 DOTDATE="$(date '+%Y%m%d%H%M')"
-mkdir -p ~/instantos/olddotfiles/"$DOTDATE"
-touch instantos/olddotfiles/"$DOTDATE"/index
+echo "archiving old dotfiles to ~/instantos/olddotfiles/$DOTDATE"
+mkdir ~/instantos/olddotfiles/"$DOTDATE"
+touch ~/instantos/olddotfiles/"$DOTDATE"/index
 
 # back up dotfile
 backupfile() {
     if [ -e "$1" ]; then
         echo "archiving old version of $1"
         DOTDATE="$(date '+%Y%m%d%H%M')"
-        touch instantos/olddotfiles/"$DOTDATE"/index
+
+        touch instantos/olddotfiles/"$DOTDATE"/index || {
+            echo "dotfiles installation failed"
+            exit
+        }
 
         mkdir -p ~/instantos/olddotfiles/"$DOTDATE"
-        cat "$1" | ctee ~/instantos/olddotfiles/"$DOTDATE"/"$TARGETNAME" >/dev/null
+        cat "$1" | ctee ~/instantos/olddotfiles/"$DOTDATE"/"$1" >/dev/null
         echo "$1" >>~/instantos/olddotfiles/"$DOTDATE"/index
     else
         echo "cannot archive $1, no old version found"
@@ -78,7 +83,7 @@ gget() {
         fi
     fi
 
-    backupfile "$TARGET"
+    backupfile "$TARGETNAME"
 
     echo "installing $1"
     if [ -e ./$1 ]; then
@@ -176,7 +181,7 @@ gget 'desktop/nm-applet.desktop' '.local/share/applications/nm-applet.desktop'
 gget 'neofetch.conf' '.config/neofetch/config.conf'
 
 gappend Xresources '.Xresources' 'instantos-general'
-gappend dunstrc '~/.config/dunst/dunstrc' '[global]'
+gappend dunstrc '.config/dunst/dunstrc' '[global]'
 
 cd ..
 rm -rf /tmp/paperdotfiles
