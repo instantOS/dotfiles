@@ -38,7 +38,7 @@ touch ~/instantos/olddotfiles/"$DOTDATE"/index
 # back up dotfile
 backupfile() {
     if [ -e "$1" ]; then
-        echo "archiving old version of $1"
+        echo "archiving old version of $2"
         DOTDATE="$(date '+%Y%m%d%H%M')"
 
         touch instantos/olddotfiles/"$DOTDATE"/index || {
@@ -47,7 +47,7 @@ backupfile() {
         }
 
         mkdir -p ~/instantos/olddotfiles/"$DOTDATE"
-        cat "$1" | ctee ~/instantos/olddotfiles/"$DOTDATE"/"$1" >/dev/null
+        cat "$1" | ctee ~/instantos/olddotfiles/"$DOTDATE"/"$2" >/dev/null
         echo "$1" >>~/instantos/olddotfiles/"$DOTDATE"/index
     else
         echo "cannot archive $1, no old version found"
@@ -83,7 +83,7 @@ gget() {
         fi
     fi
 
-    backupfile "$TARGETNAME"
+    backupfile "$TARGET" "$TARGETNAME"
 
     echo "installing $1"
     if [ -e ./$1 ]; then
@@ -107,7 +107,7 @@ gappend() {
         TARGET="$HOME/$1"
     fi
 
-    backupfile "$TARGET"
+    backupfile "$TARGET" "$TARGETNAME"
 
     echo "installing $1"
     if [ -e $TARGET ] && grep -q "papertheme" "$TARGET"; then
