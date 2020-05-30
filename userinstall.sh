@@ -26,6 +26,29 @@ echo ""
 
 mkdir ~/instantos
 
+ctee() {
+    mkdir -p ${1%/*} && command tee "$@"
+}
+
+DOTDATE="$(date '+%Y%m%d%H%M')"
+mkdir -p ~/instantos/olddotfiles/"$DOTDATE"
+touch instantos/olddotfiles/"$DOTDATE"/index
+
+# back up dotfile
+backupfile() {
+    if [ -e "$1" ]; then
+        echo "archiving old version of $1"
+        DOTDATE="$(date '+%Y%m%d%H%M')"
+        touch instantos/olddotfiles/"$DOTDATE"/index
+
+        mkdir -p ~/instantos/olddotfiles/"$DOTDATE"
+        cat "$1" | ctee ~/instantos/olddotfiles/"$DOTDATE"/"$TARGETNAME" >/dev/null
+        echo "$1" >>~/instantos/olddotfiles/"$DOTDATE"/index
+    else
+        echo "cannot archive $1, no old version found"
+    fi
+}
+
 # fetch and install config file from my repo
 gget() {
     if [ -n "$2" ]; then
@@ -55,14 +78,7 @@ gget() {
         fi
     fi
 
-    # back up old version of dotfiles
-    if [ -e "$TARGET" ]; then
-        echo "archiving old version of $TARGET"
-        DOTDATE="$(date '+%Y%m%d%H%M')"
-        [ -e ~/instantos/olddotfiles ] || mkdir -p ~/instantos/olddotfiles/"$DOTDATE"
-        cat "$TARGET" >~/instantos/olddotfiles/"$DOTDATE"/"$TARGETNAME"
-        echo "$TARGET" >>~/instantos/olddotfiles/"$DOTDATE"/index
-    fi
+    backupfile "$TARGET"
 
     echo "installing $1"
     if [ -e ./$1 ]; then
@@ -86,23 +102,7 @@ gappend() {
         TARGET="$HOME/$1"
     fi
 
-    if [ -e "$TARGET" ]; then
-        DOTDATE="$(date '+%Y%m%d%H%M')"
-        mkdir -p ~/instantos/olddotfiles/"$DOTDATE"
-        touch instantos/olddotfiles/"$DOTDATE"/index
-
-        ctee() {
-            mkdir -p ${1%/*} && command tee "$@"
-        }
-
-        if [ -e "$TARGET" ]; then
-            echo "archiving old version of $TARGET"
-            cat "$TARGET" | ctee ~/instantos/olddotfiles/"$DOTDATE"/"$TARGETNAME" >/dev/null
-            echo "$TARGET" >>~/instantos/olddotfiles/"$DOTDATE"/index
-        else
-            echo "cannot archive $TARGET, no old version found"
-        fi
-    fi
+    backupfile "$TARGET"
 
     echo "installing $1"
     if [ -e $TARGET ] && grep -q "papertheme" "$TARGET"; then
