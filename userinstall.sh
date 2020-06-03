@@ -40,7 +40,6 @@ touch ~/instantos/olddotfiles/"$DOTDATE"/index
 backupfile() {
     if [ -e "$1" ]; then
         echo "archiving old version of $2"
-        DOTDATE="$(date '+%Y%m%d%H%M')"
 
         touch ~/instantos/olddotfiles/"$DOTDATE"/index || {
             echo "dotfiles installation failed"
