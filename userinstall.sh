@@ -32,7 +32,8 @@ ctee() {
 
 DOTDATE="$(date '+%Y%m%d%H%M')"
 echo "archiving old dotfiles to ~/instantos/olddotfiles/$DOTDATE"
-mkdir ~/instantos/olddotfiles/"$DOTDATE"
+
+mkdir -p ~/instantos/olddotfiles/"$DOTDATE"
 touch ~/instantos/olddotfiles/"$DOTDATE"/index
 
 # back up dotfile
@@ -57,11 +58,12 @@ backupfile() {
 # fetch and install config file from my repo
 gget() {
     if [ -n "$2" ]; then
-        if echo $2 | grep -q '/'; then
-            ARGDIR=$HOME/${2%/*}
-            if ! [ -e "$ARGDIR" ]; then
-                echo "creating dir $ARGDIR"
-                mkdir -p "$ARGDIR" || (echo 'cannot create dir' && return 1)
+        if grep -q '/' <<<"$2"; then
+            TARGETDIR="$(echo $2 | grep -o '^.*/')"
+            TARGETDIR="$HOME/$TARGETDIR"
+            if ! [ -e "$TARGETDIR" ]; then
+                echo "creating $TARGETDIR"
+                mkdir -p "$TARGETDIR"
             fi
         fi
         TARGET="$HOME/$2"
@@ -71,15 +73,21 @@ gget() {
         TARGETNAME="$1"
     fi
 
-    if [ -e ~/.instantrc ]; then
-        if ! grep -q "$TARGET" ~/.instantrc; then
-            echo "$TARGET 1" >>~/.instantrc
-            echo "initializing config for $TARGET"
-        else
-            if grep "^$TARGET 0" ~/.instantrc; then
-                echo "skipping $TARGET, management disabled by user"
+    if ! grep -q "^$TARGET [01]" ~/.instantrc; then
+        if [ -e $TARGET ] && iconf -i askdotfiles; then
+            echo "confirming override"
+            if ! imenu -c "override $TARGET ?"; then
+                echo "disabling $TARGET"
+                echo "$TARGET 0" >>~/.instantrc
                 return
             fi
+        fi
+        echo "$TARGET 1" >>~/.instantrc
+        echo "initializing config for $TARGET"
+    else
+        if grep "^$TARGET 0" ~/.instantrc; then
+            echo "skipping $TARGET, management disabled by user"
+            return
         fi
     fi
 
@@ -95,11 +103,12 @@ gget() {
 
 gappend() {
     if [ -n "$2" ]; then
-        if echo $2 | grep -q '/'; then
-            ARGDIR=${2%/*}
-            if ! [ -e "$ARGDIR" ]; then
-                echo "creating dir $ARGDIR"
-                mkdir -p "$ARGDIR" || (pwd && echo "cannot create dir $ARGDIR" && return 1)
+        if grep -q '/' <<<"$2"; then
+            TARGETDIR="$(echo $2 | grep -o '^.*/')"
+            TARGETDIR="$HOME/$TARGETDIR"
+            if ! [ -e "$TARGETDIR" ]; then
+                echo "creating $TARGETDIR"
+                mkdir -p "$TARGETDIR"
             fi
         fi
         TARGET="$HOME/$2"
