@@ -53,6 +53,20 @@ userdotfiles() {
 
 if [ -z "$1" ]; then
     echo "single user dotfiles install"
+
+    # ask before overriding files
+    # if used outside of instantOS
+
+    if [ -e /opt/topinstall ]; then
+        if ! iconf -i dotfileconfirm; then
+            iconf -i askdotfiles 1
+            userdotfiles
+            iconf -i askdotfiles 0
+            iconf -i dotfileconfirm 1
+            exit
+        fi
+    fi
+
     userdotfiles
 else
     if [ -e /usr/share/instantdotfiles/$1.sh ]; then
