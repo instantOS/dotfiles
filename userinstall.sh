@@ -159,7 +159,6 @@ fi
 gget 'git-completion.bash' .paperbenni/git.sh
 gget 'tmux.conf' '.tmux.conf'
 gget 'bashrc.sh' '.bashrc'
-gget 'compton.conf' '.compton.conf'
 
 gget 'flameshot.ini' '.config/Dharkael/flameshot.ini'
 gget 'libinput-gestures.conf' '.config/libinput-gestures.conf'
