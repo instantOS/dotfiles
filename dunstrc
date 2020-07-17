@@ -8,6 +8,14 @@
 	history_length = 1
 	corner_radius = 12
 	icon_position = left
+	max_icon_size=128
+	word_wrap = yes
+	mouse_right_click = do_action
+	mouse_middle_click = close_all
+	mouse_left_click = close_current
+	format = "<b>%s</b>\n%b"
+	show_indicators = yes
+	dmenu = /usr/bin/instantmenu -p dunst
 
 [i3blocks]
 	summary = "*"
