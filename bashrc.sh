@@ -55,6 +55,7 @@ bind 'TAB:menu-complete'
 
 # automatically make it a tmux session
 if [ -n "$PS1" ] &&
+	[ -n "$DISPLAY" ] &&
 	[[ ! "$TERM" =~ screen ]] &&
 	[[ ! "$TERM" =~ tmux ]] &&
 	[ -z "$TMUX" ] &&
