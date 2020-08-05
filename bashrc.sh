@@ -61,9 +61,8 @@ if [ -n "$PS1" ] &&
 	[ -z "$TMUX" ] &&
 	! [ -e ~/storage/shared ]; then
 	if command -v tmux &>/dev/null; then
-		exec tmux
+		exec tmux -c bash
 	fi
-
 fi
 
 # kill all tmux sessions with no terminal emulator attached
