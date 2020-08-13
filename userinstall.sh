@@ -135,6 +135,39 @@ gappend() {
     fi
 }
 
+# initialize a file if it doesn't exist
+ginit() {
+    # auto determine target
+    if [ -n "$2" ]; then
+        if grep -q '/' <<<"$2"; then
+            TARGETDIR="$(echo $2 | grep -o '^.*/')"
+            TARGETDIR="$HOME/$TARGETDIR"
+            if ! [ -e "$TARGETDIR" ]; then
+                echo "creating $TARGETDIR"
+                mkdir -p "$TARGETDIR"
+            fi
+        fi
+        TARGET="$HOME/$2"
+        TARGETNAME="$2"
+    else
+        TARGET="$HOME/$1"
+        TARGETNAME="$1"
+    fi
+
+    if [ -e "$TARGET" ]; then
+        echo "$TARGET already initialized"
+        return
+    fi
+
+    echo "installing $1"
+    if [ -e ./$1 ]; then
+        cat "$1" >"$TARGET"
+    else
+        curl -s https://raw.githubusercontent.com/paperbenni/dotfiles/master/"$1" >"$TARGET"
+    fi
+
+}
+
 # install git completion script, source it in bashrc
 mkdir .paperbenni &>/dev/null
 
@@ -159,7 +192,6 @@ fi
 gget 'git-completion.bash' .paperbenni/git.sh
 gget 'tmux.conf' '.tmux.conf'
 gget 'bashrc.sh' '.bashrc'
-gget 'compton.conf' '.compton.conf'
 
 gget 'flameshot.ini' '.config/Dharkael/flameshot.ini'
 gget 'libinput-gestures.conf' '.config/libinput-gestures.conf'
@@ -178,9 +210,12 @@ gget 'qt5ct.conf' '.config/qt5ct/qt5ct.conf'
 gget 'texstudio.ini' '.config/texstudio/texstudio.ini'
 gget 'instantosonboard.theme' '.local/share/onboard/themes/instantosonboard.theme'
 
-gget 'init.vim' '.config/nvim/init.vim'
+ginit 'init.vim' '.config/nvim/init.vim'
 
 gget 'dmrc' '.dmrc'
+
+ginit 'xinitrc' '.xinitrc'
+chmod +x ~/.xinitrc
 
 gget 'desktop/terminal.desktop' '.local/share/file-manager/actions/terminal.desktop'
 gget 'desktop/spottoggle.desktop' '.local/share/applications/spottoggle.desktop'

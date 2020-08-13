@@ -55,14 +55,14 @@ bind 'TAB:menu-complete'
 
 # automatically make it a tmux session
 if [ -n "$PS1" ] &&
+	[ -n "$DISPLAY" ] &&
 	[[ ! "$TERM" =~ screen ]] &&
 	[[ ! "$TERM" =~ tmux ]] &&
 	[ -z "$TMUX" ] &&
 	! [ -e ~/storage/shared ]; then
 	if command -v tmux &>/dev/null; then
-		exec tmux
+		exec tmux -c bash
 	fi
-
 fi
 
 # kill all tmux sessions with no terminal emulator attached
