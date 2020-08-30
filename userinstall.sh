@@ -13,21 +13,22 @@ if whoami | grep -q '^root$'; then
 fi
 
 SCRIPTPATH="$(
-    cd "$(dirname "$0")" >/dev/null 2>&1
+    cd "$(dirname "$0")" >/dev/null 2>&1 || exit 1
     pwd -P
 )"
 
 echo ""
 echo "installing dotfiles for $(whoami)"
-cd
+cd || exit 1
 pwd
 echo "HOME $HOME"
 echo ""
 
+export DOTLINK="https://raw.githubusercontent.com/instantos/dotfiles/master"
 mkdir -p ~/instantos/olddotfiles &>/dev/null
 
 ctee() {
-    mkdir -p ${1%/*} && command tee "$@"
+    mkdir -p "${1%/*}" && command tee "$@"
 }
 
 DOTDATE="$(date '+%Y%m%d%H%M')"
@@ -47,7 +48,7 @@ backupfile() {
         }
 
         mkdir -p ~/instantos/olddotfiles/"$DOTDATE"
-        cat "$1" | ctee ~/instantos/olddotfiles/"$DOTDATE"/"$2" >/dev/null
+        ctee ~/instantos/olddotfiles/"$DOTDATE"/"$2" < "$1" >/dev/null
         echo "$1" >>~/instantos/olddotfiles/"$DOTDATE"/index
     else
         echo "cannot archive $1, no old version found"
@@ -58,7 +59,7 @@ backupfile() {
 gget() {
     if [ -n "$2" ]; then
         if grep -q '/' <<<"$2"; then
-            TARGETDIR="$(echo $2 | grep -o '^.*/')"
+            TARGETDIR="$(echo "$2" | grep -o '^.*/')"
             TARGETDIR="$HOME/$TARGETDIR"
             if ! [ -e "$TARGETDIR" ]; then
                 echo "creating $TARGETDIR"
@@ -73,7 +74,7 @@ gget() {
     fi
 
     if ! grep -q "^$TARGET [01]" ~/.instantrc; then
-        if [ -e $TARGET ] && iconf -i askdotfiles; then
+        if [ -e "$TARGET" ] && iconf -i askdotfiles; then
             echo "confirming override"
             if ! imenu -c "override $TARGET ?"; then
                 echo "disabling $TARGET"
@@ -93,17 +94,17 @@ gget() {
     backupfile "$TARGET" "$TARGETNAME"
 
     echo "installing $1"
-    if [ -e ./$1 ]; then
+    if [ -e ./"$1" ]; then
         cat "$1" >"$TARGET"
     else
-        curl -s https://raw.githubusercontent.com/paperbenni/dotfiles/master/"$1" >"$TARGET"
+        curl -s "${DOTLINK}${1}" >"$TARGET"
     fi
 }
 
 gappend() {
     if [ -n "$2" ]; then
         if grep -q '/' <<<"$2"; then
-            TARGETDIR="$(echo $2 | grep -o '^.*/')"
+            TARGETDIR="$(echo "$2" | grep -o '^.*/')"
             TARGETDIR="$HOME/$TARGETDIR"
             if ! [ -e "$TARGETDIR" ]; then
                 echo "creating $TARGETDIR"
@@ -118,19 +119,19 @@ gappend() {
     backupfile "$TARGET" "$TARGETNAME"
 
     echo "installing $1"
-    if [ -e $TARGET ] && grep -q "papertheme" "$TARGET"; then
+    if [ -e "$TARGET" ] && grep -q "papertheme" "$TARGET"; then
         if ! grep -q "$3" "$TARGET"; then
-            if [ -e ./$1 ]; then
+            if [ -e ./"$1" ]; then
                 cat "$1" >>"$TARGET"
             else
-                curl -s https://raw.githubusercontent.com/paperbenni/dotfiles/master/"$1" >>"$TARGET"
+                curl -s "${DOTLINK}$1" >>"$TARGET"
             fi
         fi
     else
-        if [ -e ./$1 ]; then
+        if [ -e ./"$1" ]; then
             cat "$1" >"$TARGET"
         else
-            curl -s https://raw.githubusercontent.com/paperbenni/dotfiles/master/"$1" >"$TARGET"
+            curl -s "${DOTLINK}$1" >"$TARGET"
         fi
     fi
 }
@@ -140,7 +141,7 @@ ginit() {
     # auto determine target
     if [ -n "$2" ]; then
         if grep -q '/' <<<"$2"; then
-            TARGETDIR="$(echo $2 | grep -o '^.*/')"
+            TARGETDIR="$(echo "$2" | grep -o '^.*/')"
             TARGETDIR="$HOME/$TARGETDIR"
             if ! [ -e "$TARGETDIR" ]; then
                 echo "creating $TARGETDIR"
@@ -160,10 +161,10 @@ ginit() {
     fi
 
     echo "installing $1"
-    if [ -e ./$1 ]; then
+    if [ -e ./"$1" ]; then
         cat "$1" >"$TARGET"
     else
-        curl -s https://raw.githubusercontent.com/paperbenni/dotfiles/master/"$1" >"$TARGET"
+        curl -s "${DOTLINK}$1" >"$TARGET"
     fi
 
 }
@@ -172,14 +173,14 @@ ginit() {
 mkdir .paperbenni &>/dev/null
 
 if [ -e "$SCRIPTPATH/rootinstall.sh" ]; then
-    cd "$SCRIPTPATH"
+    cd "$SCRIPTPATH" || exit 1
     echo "offline dotfiles found"
 else
     rm -rf /tmp/paperdotfiles
     mkdir -p /tmp/paperdotfiles
-    cd /tmp/paperdotfiles
-    git clone --depth=1 https://github.com/paperbenni/dotfiles.git &>/dev/null
-    cd dotfiles
+    cd /tmp/paperdotfiles || exit 1
+    git clone --depth=1 https://github.com/instantos/dotfiles.git &>/dev/null
+    cd dotfiles || exit 1
 fi
 
 # generate override config
@@ -226,5 +227,6 @@ gget 'neofetch.conf' '.config/neofetch/config.conf'
 gappend Xresources '.Xresources' 'instantos-general'
 gappend dunstrc '.config/dunst/dunstrc' '[global]'
 
-cd ..
+cd .. || exit 1
 rm -rf /tmp/paperdotfiles
+echo "done installing dotfiles"
