@@ -17,7 +17,7 @@ configuration {
     foreground-selected:            #ffffff;
     urgent:                         #E91E6366;
     urgent-selected:                #E91E6377;
-    border-radius:                  50px;
+    border-radius:                  1px;
 }
 
 window {
@@ -29,7 +29,7 @@ window {
     location:                       northwest;
     anchor:                         northwest;
     x-offset:                       1%;
-    y-offset:                       4%;
+    y-offset:                       5.5%;
 }
 
 prompt {
@@ -38,7 +38,7 @@ prompt {
 
 
 inputbar {
-    background-color:               @background-alt;
+    background-color:               #5293E1;
     text-color:                     @foreground;
     expand:                         false;
     margin:                         0px 20% 0px 20%;
@@ -112,6 +112,8 @@ element alternate.active {
 }
 
 element selected {
+    border: 0% 0% 0.2% 0%;
+    border-color: #5293E1;
     background-color:               @background-alt;
     text-color:                     @foreground-selected;
 }
