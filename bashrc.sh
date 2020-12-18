@@ -59,8 +59,9 @@ if [ -n "$PS1" ] &&
     [[ ! "$TERM" =~ screen ]] &&
     [[ ! "$TERM" =~ tmux ]] &&
     [ -z "$TMUX" ] &&
-    ! [ -e ~/storage/shared ]; then
-
+    ! [ -e ~/storage/shared ] &&
+    command -v tmux 2>&1 1>/dev/null
+then
     if [[ "$SHELL" == *"bash" ]]; then
         exec tmux
     else
