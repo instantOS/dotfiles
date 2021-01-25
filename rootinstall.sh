@@ -13,7 +13,10 @@ fi
 if command -v pacman && [ -e /etc/pacman.conf ] &&
     ! grep -q 'ILoveCandy' </etc/pacman.conf; then
     echo "pacmanifiying your pacman manager"
+    # Enable pacman eating progress dots eater-egg
     sed -i '/VerbosePkgLists/a ILoveCandy' /etc/pacman.conf
+    # Enable colored output
+    sed -i 's/^#Color/Color/g' /etc/pamac.conf
 fi
 
 # change greeter appearance
