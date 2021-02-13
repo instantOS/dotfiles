@@ -61,8 +61,8 @@ if [ -n "$PS1" ] &&
     [ -z "$TMUX" ] &&
     ! [ -e ~/storage/shared ] &&
     command -v tmux 2>&1 1>/dev/null
-    export TERM="screen-256color"
 then
+    export TERM="screen-256color"
     if [[ "$SHELL" == *"bash" ]]; then
         exec tmux
     else
