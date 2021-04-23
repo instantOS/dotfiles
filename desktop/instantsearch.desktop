@@ -1,0 +1,26 @@
+
+[Desktop Entry]
+Type=Action
+TargetLocation=true
+Icon[en_US]=/usr/share/icons/gnome/24x24/actions/system-search.png
+Icon[en]=/usr/share/icons/gnome/24x24/actions/system-search.png
+Icon[C]=/usr/share/icons/gnome/24x24/actions/system-search.png
+Tooltip[en_US]=Search current directory using instantsearch
+Tooltip[en]=Search current directory using instantsearch
+Tooltip[C]=Search current directory using instantsearch
+ToolbarLabel[en_US]=Search current directory using instantsearch
+ToolbarLabel[en]=Search current directory using instantsearch
+ToolbarLabel[C]=Search current directory using instantsearch
+Name[en_US]=Search current directory using instantsearch
+Name[en]=Search current directory using instantsearch
+Name[C]=Search current directory using instantsearch
+Profiles=profile-zero;
+TargetToolbar=true
+Enabled = true
+
+[X-Action-Profile profile-zero]
+Exec=cd %f; instantsearch -d .
+MimeTypes=inode/directory;
+Name[en_US]=Default profile
+Name[en]=Default profile
+Name[C]=Default profile

@@ -219,6 +219,8 @@ ginit 'xinitrc' '.xinitrc'
 chmod +x ~/.xinitrc
 
 gget 'desktop/terminal.desktop' '.local/share/file-manager/actions/terminal.desktop'
+gget 'desktop/instantsearch.desktop' '.local/share/file-manager/actions/instantsearch.desktop'
+
 gget 'desktop/spottoggle.desktop' '.local/share/applications/spottoggle.desktop'
 gget 'desktop/nm-applet.desktop' '.local/share/applications/nm-applet.desktop'
 
