@@ -12,7 +12,7 @@
 	mouse_middle_click = close_all
 	mouse_right_click = close_current
 	format = "<b>%s</b>\n%b"
-	follow = keyboard
+	follow = mouse
 	show_indicators = yes
 	markup = full
 	dmenu = /usr/bin/instantmenu -q "notification menu" -l 10 -w -1 -x 1000000 -bw 5 -y 32
