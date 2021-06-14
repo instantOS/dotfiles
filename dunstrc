@@ -16,6 +16,8 @@
 	show_indicators = yes
 	markup = full
 	dmenu = /usr/bin/instantmenu -q "notification menu" -l 10 -w -1 -x 1000000 -bw 5 -y 32
+    progress_bar_max_width = 500
+    progress_bar_frame_width = 2
 
 
 [i3blocks]
