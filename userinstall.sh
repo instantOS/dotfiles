@@ -48,7 +48,7 @@ backupfile() {
         }
 
         mkdir -p ~/instantos/olddotfiles/"$DOTDATE"
-        ctee ~/instantos/olddotfiles/"$DOTDATE"/"$2" < "$1" >/dev/null
+        ctee ~/instantos/olddotfiles/"$DOTDATE"/"$2" <"$1" >/dev/null
         echo "$1" >>~/instantos/olddotfiles/"$DOTDATE"/index
     else
         echo "cannot archive $1, no old version found"
@@ -197,6 +197,7 @@ gget 'bashrc.sh' '.bashrc'
 gget 'flameshot.ini' '.config/Dharkael/flameshot.ini'
 gget 'libinput-gestures.conf' '.config/libinput-gestures.conf'
 gget 'dunstrc' '.config/dunst/dunstrc'
+gget 'skippy-xd.rc' '.config/skippy-xd/skippy-xd.rc'
 
 gget 'ranger/rc.conf' '.config/ranger/rc.conf'
 gget 'ranger/commands.py' '.config/ranger/commands.py'
