@@ -1,3 +1,6 @@
+#... all target ~/.config/ranger/commands.py
+#... main begin
+#... main hash ACF1DAC626AD7083992143BD613B6D40EE692BBD22B19C825DDE67FE96D67456
 # This is a sample commands.py.  You can add your own commands here.
 #
 # Please refer to commands_full.py for all the default commands and a complete
@@ -62,60 +65,36 @@ class my_edit(Command):
         return self._tab_directory_content()
 
 
-# https://github.com/ranger/ranger/wiki/Integrating-File-Search-with-fzf
-# Now, simply bind this function to a key, by adding this to your ~/.config/ranger/rc.conf: map <C-f> fzf_select
 class fzf_select(Command):
-    """
-    :fzf_select
-
-    Find a file using fzf.
-
-    With a prefix argument select only directories.
-
-    See: https://github.com/junegunn/fzf
-    """
 
     def execute(self):
         import subprocess
-        if self.quantifier:
-            # match only directories
-            command = "fd -t d . ./ | fzf  +m"
-        else:
-            # match files and directories
-            command = "fd . ./ | fzf  +m"
-        fzf = self.fm.execute_command(command, stdout=subprocess.PIPE)
-        stdout, stderr = fzf.communicate()
+        import os
+        from ranger.ext.get_executables import get_executables
+
+        if 'fzf' not in get_executables():
+            self.fm.notify('Could not find fzf in the PATH.', bad=True)
+            return
+
+        env = os.environ.copy()
+        env['FZF_DEFAULT_COMMAND'] = 'fd'
+        env['FZF_DEFAULT_OPTS'] = '--height=40% --layout=reverse --ansi --preview="{}"'.format('''
+            (
+                batcat --color=always {} ||
+                bat --color=always {} ||
+                cat {} ||
+                tree -ahpCL 3 -I '.git' -I '*.py[co]' -I '__pycache__' {}
+            ) 2>/dev/null | head -n 100
+        ''')
+
+        fzf = self.fm.execute_command('fzf --no-multi', env=env,
+                                      universal_newlines=True, stdout=subprocess.PIPE)
+        stdout, _ = fzf.communicate()
         if fzf.returncode == 0:
-            fzf_file = os.path.abspath(stdout.decode('utf-8').rstrip('\n'))
-            if os.path.isdir(fzf_file):
-                self.fm.cd(fzf_file)
+            selected = os.path.abspath(stdout.strip())
+            if os.path.isdir(selected):
+                self.fm.cd(selected)
             else:
-                self.fm.select_file(fzf_file)
-# fzf_locate
+                self.fm.select_file(selected)
 
-
-class fzf_locate(Command):
-    """
-    :fzf_locate
-
-    Find a file using fzf.
-
-    With a prefix argument select only directories.
-
-    See: https://github.com/junegunn/fzf
-    """
-
-    def execute(self):
-        import subprocess
-        if self.quantifier:
-            command = "locate home media | fzf -e -i"
-        else:
-            command = "locate home media | fzf -e -i"
-        fzf = self.fm.execute_command(command, stdout=subprocess.PIPE)
-        stdout, stderr = fzf.communicate()
-        if fzf.returncode == 0:
-            fzf_file = os.path.abspath(stdout.decode('utf-8').rstrip('\n'))
-            if os.path.isdir(fzf_file):
-                self.fm.cd(fzf_file)
-            else:
-                self.fm.select_file(fzf_file)
+#... main end
