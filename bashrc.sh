@@ -1,4 +1,9 @@
 #!/usr/bin/env bash
+#... all target ~/.bashrc
+
+#... main begin
+#... main hash 298DD02D32711D76755F981762C707A226DAB92788A55842CCEDCC428C2DC8E1
+
 ##########################
 ## paperbenni's bashrc  ##
 ##########################
@@ -60,8 +65,7 @@ if [ -n "$PS1" ] &&
     [[ ! "$TERM" =~ tmux ]] &&
     [ -z "$TMUX" ] &&
     ! [ -e ~/storage/shared ] &&
-    command -v tmux 2>&1 1>/dev/null
-then
+    command -v tmux 2>&1 1>/dev/null; then
     export TERM="screen-256color"
     if [[ "$SHELL" == *"bash" ]]; then
         exec tmux
@@ -96,3 +100,5 @@ fi
 
 # autojump j function
 [ -e /usr/share/autojump/autojump.bash ] && source /usr/share/autojump/autojump.bash
+
+#... main end
