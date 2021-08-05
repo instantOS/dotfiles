@@ -16,7 +16,7 @@ if command -v pacman && [ -e /etc/pacman.conf ] &&
     # Enable pacman eating progress dots eater-egg
     sed -i '/VerbosePkgLists/a ILoveCandy' /etc/pacman.conf
     # Enable colored output
-    sed -i 's/^#Color/Color/g' /etc/pamac.conf
+    sed -i 's/^#Color/Color/g' /etc/pacman.conf
 fi
 
 # change greeter appearance
