@@ -1,3 +1,4 @@
+#... all target ~/.config/jgmenu/jgmenurc
 menu_height_min = 200
 menu_width = 200
 menu_border = 3

@@ -1,3 +1,5 @@
+#... all target .local/share/applications/nm-applet.desktop
+
 [Desktop Entry]
 Type=Application
 Name=Network Settings
