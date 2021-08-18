@@ -17,6 +17,7 @@ if command -v pacman && [ -e /etc/pacman.conf ] &&
     sed -i '/VerbosePkgLists/a ILoveCandy' /etc/pacman.conf
     # Enable colored output
     sed -i 's/^#Color/Color/g' /etc/pacman.conf
+    sed -i '/^#ParallelDownloads/s/^#//g' /etc/pacman.conf
 fi
 
 # change greeter appearance
