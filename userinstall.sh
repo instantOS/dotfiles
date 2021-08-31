@@ -225,7 +225,6 @@ gget 'desktop/instantsearch.desktop' '.local/share/file-manager/actions/instants
 gget 'desktop/spottoggle.desktop' '.local/share/applications/spottoggle.desktop'
 gget 'desktop/nm-applet.desktop' '.local/share/applications/nm-applet.desktop'
 
-gget 'neofetch.conf' '.config/neofetch/config.conf'
 
 gappend Xresources '.Xresources' 'instantos-general'
 gappend dunstrc '.config/dunst/dunstrc' '[global]'
