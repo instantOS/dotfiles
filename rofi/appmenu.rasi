@@ -90,8 +90,9 @@ element {
 
 element-icon {
     size:                           10%;
-    background-color: inherit;
-    text-color:       inherit;
+    background-color:               inherit;
+    text-color:                     inherit;
+    horizontal-align:               0.5;
 }
 
 element-text {
