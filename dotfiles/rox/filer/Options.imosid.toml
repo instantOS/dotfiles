@@ -1,0 +1,5 @@
+hash = "776427A917D2A674AC7042C8031E00BD440CA3B4D9FD2314C2F67C39BB3FAC0F"
+imosidversion = "0.0.0-beta7"
+parent = "Options"
+syntaxversion = "0"
+target = "~/.config/rox.sourceforge.net/ROX-Filer/Options"

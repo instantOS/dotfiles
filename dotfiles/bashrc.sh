@@ -1,8 +1,17 @@
 #!/usr/bin/env bash
 #... all target ~/.bashrc
 
+
+
+
+
+
+
+
+
+
 #... main begin
-#... main hash 298DD02D32711D76755F981762C707A226DAB92788A55842CCEDCC428C2DC8E1
+#... main hash 3AB7EED23F4E14792833DE254903BAC77DC8FDDAF6C7484D19ECD31E2383519B
 
 ##########################
 ## paperbenni's bashrc  ##

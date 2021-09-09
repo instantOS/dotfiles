@@ -1,5 +1,7 @@
 #... all target .local/share/applications/nm-applet.desktop
 
+#... main begin
+#... main hash F39186F3BB073505ECCEEF9A1B1898CA0AF7263C61B61A3D767DB11164894B23
 [Desktop Entry]
 Type=Application
 Name=Network Settings
@@ -8,3 +10,4 @@ Icon=wifi-radar
 TryExec=nm-applet
 Exec=nm-applet
 Terminal=false
+#... main end

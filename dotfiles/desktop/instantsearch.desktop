@@ -1,4 +1,6 @@
 #... all target .local/share/file-manager/actions/instantsearch.desktop
+#... desktop begin
+#... desktop hash 97FDD6F9C7CEA020D5C35FF6E79D27BBB8EB6C3A40963CF152118289207F2036
 
 [Desktop Entry]
 Type=Action
@@ -18,10 +20,15 @@ Name[C]=Search current directory using instantsearch
 Profiles=profile-zero;
 TargetToolbar=true
 Enabled = true
+#... desktop end
 
+#... action begin
+#... action hash 3B24DDBB25FBF605D5EAD9F857D02C1D4A20F8295A2642CDC3DB7AE66B1D36E5
 [X-Action-Profile profile-zero]
 Exec=cd %f; instantsearch -d .
 MimeTypes=inode/directory;
 Name[en_US]=Default profile
 Name[en]=Default profile
 Name[C]=Default profile
+
+#... action end

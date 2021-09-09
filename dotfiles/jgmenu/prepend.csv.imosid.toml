@@ -1,0 +1,5 @@
+hash = "3F996004AE3BD1D5EF472FDB09213C295C8052EFE9A3C6F40880AF5B560C40D7"
+imosidversion = "0.0.0-beta7"
+parent = "prepend.csv"
+syntaxversion = "0"
+target = "~/.config/jgmenu/prepend.csv"
