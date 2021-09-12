@@ -25,7 +25,7 @@ fi
 # change greeter appearance
 echo "installing instantOS lightdm greeter session"
 [ -e /etc/lightdm ] || mkdir -p /etc/lightdm
-cat /usr/share/instantdotfiles/lightdm-gtk-greeter.conf >/etc/lightdm/lightdm-gtk-greeter.conf
+cat /usr/share/instantdotfiles/rootconfig/lightdm-gtk-greeter.conf >/etc/lightdm/lightdm-gtk-greeter.conf
 
 # fix/improve grub settings on nvidia
 # also fixes tty resolution
