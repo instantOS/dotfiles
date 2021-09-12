@@ -1,4 +1,5 @@
 #... all target ~/.config/ranger/commands.py
+#... all permissions 755
 #... main begin
 #... main hash 796963F8488A24DC336C61CE3504256DD2127CA80F06E885CDE2179A1399B04C
 # This is a sample commands.py.  You can add your own commands here.
