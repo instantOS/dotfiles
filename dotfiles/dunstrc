@@ -37,20 +37,21 @@
 #... theme hash B157EC95F4E205673F7A502FA365942A3063582BF295D986DA2DBA5AC386A31E
 
 [urgency_low]
-    background = "#292F3A"
+    background = "#121212"
     foreground = "#FFFFFF"
-    frame_color = "#52E067"
+    frame_color = "#80C895"
     timeout = 5
 
 [urgency_normal]
-    background = "#292F3A"
+    background = "#121212"
     foreground = "#FFFFFF"
-    frame_color = "#5293E1"
+    frame_color = "#88B2F6"
     timeout = 10
 
 [urgency_critical]
-    background = "#292F3A"
+    background = "#121212"
     foreground = "#FFFFFF"
+    frame_color = "#F18A81"
     timeout = 20
 
 #... theme end
