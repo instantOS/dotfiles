@@ -10,13 +10,13 @@ configuration {
 
 * {
     background:                     #00000000;
-    background-color:               #292F3A;
+    background-color:               #121212;
     background-entry:               #00000033;
-    background-alt:                 #393F4A;
-    foreground:                     #ffffff;
-    foreground-selected:            #ffffff;
-    urgent:                         #E91E6366;
-    urgent-selected:                #E91E6377;
+    background-alt:                 #384252;
+    foreground:                     #dfdfdf;
+    foreground-selected:            #dfdfdf;
+    urgent:                         #F28B8266;
+    urgent-selected:                #F28B8277;
     border-radius:                  1px;
 }
 
@@ -38,7 +38,7 @@ prompt {
 
 
 inputbar {
-    background-color:               #5293E1;
+    background-color:               #384252;
     text-color:                     @foreground;
     expand:                         false;
     margin:                         0px 20% 0px 20%;
@@ -118,7 +118,7 @@ element alternate.active {
 
 element selected {
     border: 0% 0% 0.2% 0%;
-    border-color: #5293E1;
+    border-color: #89B3F7;
     background-color:               @background-alt;
     text-color:                     @foreground-selected;
 }
