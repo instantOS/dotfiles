@@ -1,7 +1,7 @@
 #... all target ~/.config/dunst/dunstrc
 
-#... global begin
-#... global hash 8B57490637F84DF224BA4385BDF0680AC9DDEF0F2CDDE8DF6CF831AF632FB673
+#... main begin
+#... main hash 8B57490637F84DF224BA4385BDF0680AC9DDEF0F2CDDE8DF6CF831AF632FB673
 
 [global]
 	geometry = "500x7-30+40"
@@ -31,7 +31,7 @@
 	urgency = normal
 	script = /usr/bin/instantnotifytrigger
 
-#... global end
+#... main end
 
 #... theme begin
 #... theme hash B157EC95F4E205673F7A502FA365942A3063582BF295D986DA2DBA5AC386A31E
