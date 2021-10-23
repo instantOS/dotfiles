@@ -4,26 +4,29 @@
 #... main hash 8B57490637F84DF224BA4385BDF0680AC9DDEF0F2CDDE8DF6CF831AF632FB673
 
 [global]
-	geometry = "500x7-30+40"
-	frame_width = 4
+    width = 500
+    height = (64, 400)
+    offset = 15x50
+    frame_width = 4
     separator_height = 0
-	padding = 8
+    padding = 8
     horizontal_padding = 8
-	history_length = 1
-	icon_position = left
-	max_icon_size=64
-	word_wrap = yes
-	mouse_left_click = do_action
-	mouse_middle_click = close_all
-	mouse_right_click = close_current
-	format = "<b>%s</b>\n%b"
-	follow = mouse
-	show_indicators = yes
-	markup = full
+    history_length = 1
+    icon_position = left
+    max_icon_size=64
+    word_wrap = yes
+    mouse_left_click = do_action,close_current
+    mouse_middle_click = close_all
+    mouse_right_click = close_current
+    format = "<b>%s</b>\n%b"
+    follow = mouse
+    show_indicators = yes
+    markup = full
     font = Cantarell 12
-	dmenu = /usr/bin/instantmenu -q "notification menu" -l 10 -w -1 -x 1000000 -bw 5 -y 32
+    dmenu = /usr/bin/instantmenu -q "notification menu" -l 10 -w -1 -x 1000000 -bw 5 -y 32
     progress_bar_max_width = 500
     progress_bar_frame_width = 2
+    highlight = "#88B2F6"
 
 
 [i3blocks]
@@ -53,5 +56,9 @@
     foreground = "#FFFFFF"
     frame_color = "#F18A81"
     timeout = 20
+
+[Volume]
+    summary = "Volume *"
+    timeout = 1
 
 #... theme end
