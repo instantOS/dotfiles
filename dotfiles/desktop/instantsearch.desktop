@@ -24,7 +24,7 @@ Enabled = true
 #... desktop end
 
 #... action begin
-#... action hash 3B24DDBB25FBF605D5EAD9F857D02C1D4A20F8295A2642CDC3DB7AE66B1D36E5
+#... action hash 2DB4D28CE2D94410766BC02F66575187AE9BD1017817F6FB325B1E5CD36DF0BE
 [X-Action-Profile profile-zero]
 Exec=instantsearch -d %f
 MimeTypes=inode/directory;
