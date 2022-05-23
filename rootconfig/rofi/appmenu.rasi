@@ -71,6 +71,15 @@ listview {
     cycle:                          false;
     dynamic:                        true;
     layout:                         vertical;
+    scrollbar: 			            true;
+}
+
+scrollbar {
+    width:        		            4px ;
+    border:       		            0;
+    handle-color: 		            @foreground;
+    handle-width: 		            8px ;
+    padding:      		            0;
 }
 
 mainbox {
