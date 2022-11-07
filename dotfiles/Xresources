@@ -1,45 +1,45 @@
 !... all target ~/.Xresources
 !... main begin
-!... main hash 58592B36BBA7940A1A074CEDA495764716B8AF91C53422C59401D902A348BA3C
+!... main hash 6A1FD9ACD6C44CB257FCE11473F1281A68DF85AAE11903CF60977F566BEE7265
 
 URxvt.scrollBar: false
 URxvt.perl-ext-common: resize-font
 Xcursor.size: 16
 
-*.background: #383c4a
-*.foreground: #D2D2D2
+*.background: #282C34
+*.foreground: #ABB2BF
 
 !black
-*color0: #383c4a
-*color8: #626A7E
+*color0: #3F4451
+*color8: #4F5666
 
 !red
-*color1: #E0527E
-*color9: #E7766B
+*color1: #E05561
+*color9: #FF616E
 
 !green
-*color2: #4BEC90
-*color10: #3CBF75
+*color2: #8CC265
+*color10: #A5E075
 
 !yellow
-*color3: #D8D782
-*color11: #CFCD63
+*color3: #D18F52
+*color11: #F0A45D
 
 !blue
-*color4: #5294e2
-*color12: #579CEF
+*color4: #4AA5F0
+*color12: #4DC4FF
 
 !magenta
-*color5: #CE50DD
-*color13: #E7766B
+*color5: #C162DE
+*color13: #DE73FF
 
 !cyan
-*color6: #6BE5E7
-*color14: #90FDFF
+*color6: #42B3C2
+*color14: #4CD1E0
 
 !white
-*color7: #CCCCCC
-*color15: #FFFFFF
+*color7: #D7DAE0
+*color15: #E6E6E6
 
 URxvt.font: xft:Fira Code Nerd Font Mono:size=13
 
