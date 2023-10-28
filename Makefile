@@ -11,8 +11,10 @@ install:
 	chmod +x *.sh
 	chmod +x fonts/*.sh
 	install -m644 -D LICENSE $(DESTDIR)$(PREFIX)/share/licenses/instantdotfiles/LICENSE
-	mv ./* $(DESTDIR)$(PREFIX)/share/instantdotfiles/
+	cp -r ./* $(DESTDIR)$(PREFIX)/share/instantdotfiles/
 	rm $(DESTDIR)$(PREFIX)/share/instantdotfiles/LICENSE
+	rm $(DESTDIR)$(PREFIX)/share/instantdotfiles/README.md
+	rm $(DESTDIR)$(PREFIX)/share/instantdotfiles/Makefile
 
 .PHONY: uninstall
 uninstall:
