@@ -11,16 +11,21 @@ if ! [ "$(whoami)" = "root" ]; then
     exit 1
 fi
 
-# enable arch pacman easter egg
-if command -v pacman && [ -e /etc/pacman.conf ] &&
-    ! grep -q 'ILoveCandy' </etc/pacman.conf; then
-    echo "pacmanifiying your package manager"
-    # Enable pacman eating progress dots eater-egg
-    sed -i '/VerbosePkgLists/a ILoveCandy' /etc/pacman.conf
-    # Enable colored output
-    sed -i 's/^#Color/Color/g' /etc/pacman.conf
-    sed -i '/^#ParallelDownloads/s/^#//g' /etc/pacman.conf
-fi
+enable_pacman_dots() {
+    # enable arch pacman easter egg
+    if command -v pacman && [ -e /etc/pacman.conf ] &&
+        ! grep -q 'ILoveCandy' </etc/pacman.conf; then
+        echo "pacmanifiying your package manager"
+        # Enable pacman eating progress dots eater-egg
+        sed -i '/VerbosePkgLists/a ILoveCandy' /etc/pacman.conf
+        # Enable colored output
+        sed -i 's/^#Color/Color/g' /etc/pacman.conf
+        sed -i '/^#ParallelDownloads/s/^#//g' /etc/pacman.conf
+    fi
+}
+
+enable_pacman_dots
+
 
 # change greeter appearance
 echo "installing instantOS lightdm greeter session"

@@ -11,7 +11,7 @@
 
 
 #... main begin
-#... main hash 3AB7EED23F4E14792833DE254903BAC77DC8FDDAF6C7484D19ECD31E2383519B
+#... main hash 99F7B5AA7F18F6A538F442CA6C44C903B03519A820A4B8FF9EEBAD74BDF3950F
 
 ##########################
 ## paperbenni's bashrc  ##
@@ -106,8 +106,5 @@ i() {
 if [ -f /etc/bash_completion ] && ! shopt -oq posix; then
     . /etc/bash_completion
 fi
-
-# autojump j function
-[ -e /usr/share/autojump/autojump.bash ] && source /usr/share/autojump/autojump.bash
 
 #... main end
