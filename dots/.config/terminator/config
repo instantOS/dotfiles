@@ -1,0 +1,50 @@
+[global_config]
+  borderless = True
+[keybindings]
+[profiles]
+  [[default]]
+    background_color = "#1e1e2e"
+    background_image = None
+    font = FiraCode Nerd Font Mono 12
+    foreground_color = "#cdd6f4"
+    scrollbar_position = hidden
+    palette = "#45475a:#f38ba8:#a6e3a1:#f9e2af:#89b4fa:#f5c2e7:#94e2d5:#bac2de:#585b70:#f38ba8:#a6e3a1:#f9e2af:#89b4fa:#f5c2e7:#94e2d5:#a6adc8"
+    use_system_font = False
+    title_hide_sizetext = True
+    title_transmit_bg_color = "#464959"
+    title_inactive_fg_color = "#1a1a27"
+    title_inactive_bg_color = "#959bb2"
+    title_use_system_font = False
+    title_font = FiraCode Nerd Font Mono 9
+  [[Catppuccin_Latte]]
+    background_color = "#eff1f5"
+    background_image = None
+    font = FiraCode Nerd Font Mono 13
+    foreground_color = "#4c4f69"
+    scrollbar_position = hidden
+    palette = "#5c5f77:#d20f39:#40a02b:#df8e1d:#1e66f5:#ea76cb:#179299:#acb0be:#6c6f85:#d20f39:#40a02b:#df8e1d:#1e66f5:#ea76cb:#179299:#bcc0cc"
+    use_system_font = False
+  [[Catppuccin_Frappe]]
+    background_color = "#303446"
+    background_image = None
+    font = FiraCode Nerd Font Mono 13
+    foreground_color = "#c6d0f5"
+    scrollbar_position = hidden
+    palette = "#51576d:#e78284:#a6d189:#e5c890:#8caaee:#f4b8e4:#81c8be:#b5bfe2:#626880:#e78284:#a6d189:#e5c890:#8caaee:#f4b8e4:#81c8be:#a5adce"
+    use_system_font = False
+  [[Catppuccin_Macchiato]]
+    background_color = "#1e1e2e"
+    background_image = None
+    foreground_color = "#cdd6f4"
+    scrollbar_position = hidden
+    palette = "#45475a:#f38ba8:#a6e3a1:#f9e2af:#89b4fa:#f5c2e7:#94e2d5:#bac2de:#585b70:#f38ba8:#a6e3a1:#f9e2af:#89b4fa:#f5c2e7:#94e2d5:#a6adc8"
+    use_system_font = False
+[layouts]
+  [[default]]
+    [[[child1]]]
+      parent = window0
+      type = Terminal
+    [[[window0]]]
+      parent = ""
+      type = Window
+[plugins]

@@ -1,0 +1,30 @@
+#... all target ~/.config/jgmenu/jgmenurc
+
+#... behavior begin
+#... behavior hash 011D65531B807E4157AF3A07E4EBACA445F89D998ED3E380B7B188F2479609BF
+position_mode = pointer
+hover_delay = 10
+terminal_exec = urxvt
+#... behavior end
+
+#... appearance begin
+#... appearance hash F9E87803287950A13760AB353B806BFEA9C687209147855E3CA41608CC96372A
+icon_theme = Papirus
+menu_height_min = 200
+menu_width = 200
+menu_border = 3
+icon_size = 50
+item_height = 50
+icon_text_spacing = 30
+menu_padding_top = 50
+menu_width = 250
+menu_padding_left = 10
+#... appearance end
+
+#... color begin
+#... color hash 68C3A582073882D201534885E710C4204843B6C276571BE736FF4B1B4E787C31
+color_menu_bg = #292F3A
+color_menu_border = #5293E1
+color_norm_fg = #FEFEFE
+color_sel_bg = #5293E1
+#... color end
