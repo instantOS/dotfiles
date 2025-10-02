@@ -1,6 +1,0 @@
-<?xml version="1.0"?>
-<special-files>
-  <rule match="/usr/bin/nautilus">
-    <icon>/usr/share/icons/Papirus/64x64@2x/places/folder.svg</icon>
-  </rule>
-</special-files>
