@@ -1,9 +1,9 @@
 
 
 set recolor-keephue true
-set recolor true
 set selection-clipboard clipboard
 
 include catppuccin-mocha
 
+set recolor false
 
