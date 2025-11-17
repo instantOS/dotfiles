@@ -22,13 +22,10 @@ gui:
       - '#cdd6f4'
     searchingActiveBorderColor:
       - '#f9e2af'
-
 git:
-  paging:
-    colorArg: always
-    pager: delta --dark --paging=never
-
-
+  pagers:
+    - colorArg: always
+      pager: delta --dark --paging=never
 customCommands:
   - key: "<c-v>"
     command: 'git commit -m "{{ .Form.Type }}{{if .Form.Scopes}}({{ .Form.Scopes }}){{end}}: {{ .Form.Description }}"'
