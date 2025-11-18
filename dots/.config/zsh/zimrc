@@ -1,0 +1,15 @@
+zmodule environment
+zmodule input
+zmodule utility
+
+zmodule ajeetdsouza/zoxide
+
+zmodule ohmyzsh/ohmyzsh --root plugins/fzf
+zmodule zsh-users/zsh-completions --fpath src
+
+zmodule completion
+
+zmodule zsh-users/zsh-autosuggestions
+zmodule zsh-users/zsh-syntax-highlighting
+
+zmodule Aloxaf/fzf-tab
