@@ -6,6 +6,9 @@
     exec tmux &&
     exit
 
+export PATH="$HOME/.cargo/bin:$HOME/.local/bin:$PATH"
+eval "$(mise activate zsh)"
+
 zstyle ':fzf-tab:*' use-fzf-default-opts yes
 export FZF_DEFAULT_OPTS=" \
 --color=bg+:#313244,bg:#1e1e2e,spinner:#f5e0dc,hl:#f38ba8 \
@@ -30,7 +33,6 @@ fi
 
 source ${ZIM_HOME}/init.zsh
 #
-export PATH="$HOME/.cargo/bin:$HOME/.local/share/gem/ruby/3.0.0/bin:$HOME/.local/bin:$PATH"
 
 source <(COMPLETE=zsh ins)
 
