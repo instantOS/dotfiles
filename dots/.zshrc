@@ -1,6 +1,6 @@
 #!/usr/bin/zsh
 
-[ -z "$NOTMUX" ] && [ -z "$TMUX" ] &&
+[ -n "$USETMUX" ] && [ -z "$TMUX" ] &&
     ! [ "$TERM_PROGRAM" = "vscode" ] &&
     command -v tmux &>/dev/null &&
     exec tmux &&
