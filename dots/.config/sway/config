@@ -31,7 +31,7 @@ include catppuccin-mocha
 ### Output configuration
 #
 # Default wallpaper (more resolutions are available in /usr/share/backgrounds/sway/)
-output * bg /usr/share/backgrounds/sway/Sway_Wallpaper_Blue_1920x1080.png fill
+# output * bg /usr/share/backgrounds/sway/Sway_Wallpaper_Blue_1920x1080.png fill
 #
 # Example configuration:
 #
@@ -69,6 +69,8 @@ exec swayidle -w \
          timeout 600 'swaymsg "output * dpms off"' resume 'swaymsg "output * dpms on"' \
          before-sleep 'swaylock -f -c 000000'
 
+exec ins autostart
+
 # This will lock your screen after 300 seconds of inactivity, then turn off
 # your displays after another 300 seconds, and turn your screens back on when
 # resumed. It will also lock your screen before your computer goes to sleep.
@@ -93,7 +95,7 @@ exec swayidle -w \
 #
 # Start a terminal
 bindsym $mod+Return exec $term
-bindsym $mod+a exec instantassist
+# bindsym $mod+a exec instantassist
 bindsym $mod+Shift+v exec clipcat-menu
 
 bindsym $mod+Mod1+space exec "swaymsg input type:keyboard xkb_switch_layout next"
@@ -108,6 +110,7 @@ bindsym $mod+space exec $menu2
 bindsym $mod+Ctrl+q exec instantshutdown
 
 bindsym $mod+p exec $instantmenu
+bindsym $mod+Shift+s exec ins settings --gui
 bindsym $mod+y exec $term -e yazi
 
 
@@ -290,6 +293,15 @@ bar {
     }
 }
 
+mode "passthrough" {
+    # This is the only keybinding that will work in this mode
+    # It allows you to return to normal Sway control
+    bindsym $mod+Pause mode "default"
+}
+
+# Binding to enter the passthrough mode
+bindsym $mod+Pause mode "passthrough"
+
 # target                 title     bg    text   indicator  border
 client.focused           $lavender $surface1 $text  $rosewater $lavender
 client.focused_inactive  $overlay0 $surface2 $text  $rosewater $overlay0
@@ -302,3 +314,7 @@ include /etc/sway/config.d/*
 
 exec "xrdb ~/.Xresources"
 exec clipcatd
+
+# BEGIN instantCLI assists integration (managed automatically)
+include ~/.config/sway/instantassist
+# END instantCLI assists integration
