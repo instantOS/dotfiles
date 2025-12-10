@@ -59,5 +59,7 @@ function y() {
 
 set -o emacs
 
+command_not_found_handler() {commandfinder $@}
+
 eval "$(starship init zsh)"
 
