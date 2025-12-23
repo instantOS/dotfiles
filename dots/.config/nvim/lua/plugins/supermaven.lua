@@ -13,7 +13,7 @@ return {
 					return true
 				end
 
-				local password_path = vim.fn.expand("~/.password-store")
+				local password_store_path = vim.fn.expand("~/.password-store")
 				if file_path:match("^" .. vim.fn.escape(password_store_path, "%.") .. "/") then
 					return true
 				end
@@ -38,6 +38,10 @@ return {
 				-- Check if the file is in the ~/.ssh directory
 				local ssh_dir = vim.fn.expand("~/.ssh")
 				if file_path:match("^" .. vim.fn.escape(ssh_dir, "%.") .. "/") then
+					return true
+				end
+				-- Check if filename contains 'secret'
+				if filename:lower():match("secret") then
 					return true
 				end
 			end,

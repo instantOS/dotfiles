@@ -5,6 +5,7 @@ local i = ls.insert_node
 local f = ls.function_node
 local extras = require("luasnip.extras")
 local conds = require("luasnip.extras.expand_conditions")
+local fmta = require("luasnip.extras.fmt").fmta
 
 -- Function to check if cursor is inside a LaTeX math block in markdown
 local function in_latex_math_block()
@@ -24,23 +25,36 @@ local function in_anki_file()
 	return string.find(file_path, "anki") and string.match(file_path, "%.md$")
 end
 
-local function ankisnip(trigger, replacement, extras)
+local function in_video_file()
+	local file_path = vim.api.nvim_buf_get_name(0)
+	return string.find(file_path, "video") and string.match(file_path, "%.md$")
+end
+
+local function conditional_snip(trigger, replacement, condition, extras)
 	return s(
 		vim.tbl_extend("force", {
 			snippetType = "autosnippet",
 			trig = trigger,
-			condition = in_anki_file,
+			condition = condition,
 		}, extras),
 		replacement
 	)
 end
 
--- TODO: condition for not math mode or within anything special
+local function ankisnip(trigger, replacement, extras)
+	return conditional_snip(trigger, replacement, in_anki_file, extras)
+end
+
+local function videosnip(trigger, replacement, extras)
+	return conditional_snip(trigger, replacement, in_video_file, extras)
+end
+
 local function blockenv(name)
 	return s({
-		trig = "^" .. name .. " ",
+		trig = "^" .. name .. ":",
 		snippetType = "autosnippet",
 		regTrig = true,
+		wordTrig = false,
 	}, {
 		t({ "```" .. name, "" }),
 		i(1),
@@ -49,10 +63,24 @@ local function blockenv(name)
 end
 
 local staticmdsnippets = {
-	-- TODO: more envs
 	blockenv("bash"),
 	blockenv("txt"),
 	blockenv("python"),
+	blockenv("rust"),
+	videosnip("^music:", {
+		t({ "```music", "" }),
+		i(1),
+		t({ "", "```" }),
+	}, {
+		regTrig = true,
+	}),
+	videosnip("^ps  ", {
+		t({ "", "---", "" }),
+		i(1),
+		t({ "", "---", "" }),
+	}, {
+		regTrig = true,
+	}),
 	ankisnip(
 		"^QA",
 		fmta(
