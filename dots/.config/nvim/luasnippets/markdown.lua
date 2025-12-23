@@ -63,6 +63,18 @@ local function blockenv(name)
 end
 
 local staticmdsnippets = {
+	s({
+		trig = "^img ",
+		snippetType = "autosnippet",
+		regTrig = true,
+		wordTrig = false,
+	}, {
+		t("!["),
+		i(1),
+		t("]("),
+		i(2),
+		t(")"),
+	}),
 	blockenv("bash"),
 	blockenv("txt"),
 	blockenv("python"),
