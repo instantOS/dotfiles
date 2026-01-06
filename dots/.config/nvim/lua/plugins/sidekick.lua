@@ -2,21 +2,22 @@ return {
 	"folke/sidekick.nvim",
 	opts = {
 		nes = {
-			enabled = function(buf)
-				-- Check if file contains "secret" (case-insensitive)
-				local filename = vim.api.nvim_buf_get_name(buf)
-				if filename == "" then
-					return true
-				end -- allow for unnamed buffers
-
-				local content = vim.fn.readfile(filename)
-				for _, line in ipairs(content) do
-					if line:lower():find("secret") then
-						return false -- disable sidekick for files containing "secret"
-					end
-				end
-				return true
-			end,
+			enabled = false,
+			-- enabled = function(buf)
+			-- 	-- Check if file contains "secret" (case-insensitive)
+			-- 	local filename = vim.api.nvim_buf_get_name(buf)
+			-- 	if filename == "" then
+			-- 		return true
+			-- 	end -- allow for unnamed buffers
+			--
+			-- 	local content = vim.fn.readfile(filename)
+			-- 	for _, line in ipairs(content) do
+			-- 		if line:lower():find("secret") then
+			-- 			return false -- disable sidekick for files containing "secret"
+			-- 		end
+			-- 	end
+			-- 	return true
+			-- end,
 		},
 		cli = {
 			prompts = {
