@@ -1,3 +1,7 @@
 name = "dotfiles"
 description = "the default instantOS dotfiles"
-dots_dirs = ["dots"]
+dots_dirs = [
+    "dots",
+    "termux",
+]
+units = []
