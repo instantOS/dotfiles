@@ -41,12 +41,6 @@ return {
 	},
 	opts = {
 		legacy_commands = false,
-		follow_url_func = function(url)
-			vim.ui.open(url)
-		end,
-		follow_pdf_func = function(pdf)
-			vim.ui.open(pdf)
-		end,
 		completion = {
 			blink = true,
 			nvim_cmp = false,
