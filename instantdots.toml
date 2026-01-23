@@ -5,3 +5,5 @@ dots_dirs = [
     "termux",
 ]
 units = []
+
+default_active_subdirs = ["dots"]
