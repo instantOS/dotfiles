@@ -1,4 +1,6 @@
 #!/usr/bin/zsh
+#
+# paperbenni's default zshrc
 
 [ -n "$USETMUX" ] && [ -z "$TMUX" ] &&
     ! [ "$TERM_PROGRAM" = "vscode" ] &&
@@ -6,8 +8,6 @@
     exec tmux &&
     exit
 
-export PATH="$HOME/.cargo/bin:$HOME/.local/bin:$PATH"
-eval "$(mise activate zsh)"
 
 zstyle ':fzf-tab:*' use-fzf-default-opts yes
 export FZF_DEFAULT_OPTS=" \
@@ -17,6 +17,10 @@ export FZF_DEFAULT_OPTS=" \
 --color=selected-bg:#45475a \
 --multi"
 
+bindkey -e
+
+# mise
+eval "$(mise activate zsh)"
 
 ZIM_CONFIG_FILE=~/.config/zsh/zimrc
 ZIM_HOME=~/.zim
@@ -32,21 +36,30 @@ if [[ ! ${ZIM_HOME}/init.zsh -nt ${ZIM_CONFIG_FILE:-${ZDOTDIR:-${HOME}}/.zimrc} 
 fi
 
 source ${ZIM_HOME}/init.zsh
-#
 
 source <(COMPLETE=zsh ins)
 
+export PATH="$PATH:~/bin"
 
-alias lg=lazygit
-alias pls=sudo
 alias v=nvim
-alias vv="nvim ."
-
 alias g=git
+alias lg=lazygit
+alias vv="nvim ."
+alias open="xdg-open"
+alias i=ins
+
 alias j=just
 
-alias open=xdg-open
-alias i=ins
+eval "$(starship init zsh)"
+
+sshh() {
+    if ! ssh-add -l &>/dev/null; then
+        if [ -z "$SSH_AGENT_PID" ] || ! ps -p "$SSH_AGENT_PID"; then
+            eval "$(ssh-agent)"
+        fi
+        ssh-add -l 2>/dev/null | grep -q 'RSA' || ssh-add
+    fi
+}
 
 function y() {
 	local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
@@ -57,9 +70,13 @@ function y() {
 	rm -f -- "$tmp"
 }
 
-set -o emacs
+export PATH="$HOME/node_modules/.bin:$PATH"
+export PATH="$HOME/.local/bin:$PATH"
+export PATH="$HOME/.cargo/bin:$PATH"
 
 command_not_found_handler() {commandfinder $@}
 
-eval "$(starship init zsh)"
+set -o emacs
 
+# opencode
+export PATH="$HOME/.opencode/bin:$PATH"

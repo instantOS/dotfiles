@@ -315,6 +315,7 @@ include /etc/sway/config.d/*
 exec "xrdb ~/.Xresources"
 exec clipcatd
 
-# BEGIN instantCLI assists integration (managed automatically)
-include ~/.config/sway/instantassist
-# END instantCLI assists integration
+
+# BEGIN instantCLI integration (managed automatically)
+include ~/.config/sway/instant
+# END instantCLI integration

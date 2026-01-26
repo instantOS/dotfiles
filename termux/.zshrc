@@ -1,3 +1,5 @@
+#!/usr/bin/zsh
+#
 # paperbenni's default zshrc
 
 zstyle ':fzf-tab:*' use-fzf-default-opts yes
@@ -28,14 +30,6 @@ source ${ZIM_HOME}/init.zsh
 autoload -U compinit
 compinit
 
-if ! [ -e ~/lena ]
-then
-    set -o vi
-fi
-# clear
-
-source ~/.config/zsh/music.zsh
-
 export PATH="$PATH:~/bin"
 
 alias s="cd ~/storage/shared || termux-setup-storage"
@@ -61,9 +55,6 @@ sshh() {
         ssh-add -l 2>/dev/null | grep -q 'RSA' || ssh-add
     fi
 }
-
-export PATH="$PATH:$PREFIX/local/bin:$HOME/git-annex.linux/bin"
-
 
 function y() {
 	local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
