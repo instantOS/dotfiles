@@ -1,9 +1,7 @@
-name = "dotfiles"
-description = "the default instantOS dotfiles"
-dots_dirs = [
-    "dots",
-    "termux",
-]
-units = []
-
-default_active_subdirs = ["dots"]
+name = "dotfiles"  # Repository name (used for identification)
+# author = ""  # Repository author/maintainer
+description = "the default instantOS dotfiles"  # Repository description
+# read_only = false  # Whether repository is read-only (default: false)
+dots_dirs = ["dots", "termux"]  # Directories containing dotfiles (e.g., ['dots'])
+default_active_subdirs = ["dots"]  # Default active subdirectories (defaults to first in dots_dirs)
+units = ["~/.config/nvim"]  # Directories treated as atomic units (all files modified together)
