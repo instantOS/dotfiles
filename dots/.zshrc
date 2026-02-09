@@ -79,4 +79,3 @@ export PATH="$HOME/.cargo/bin:$PATH"
 export PATH="$HOME/.opencode/bin:$PATH"
 
 command_not_found_handler() {which commandfinder && commandfinder $@}
-
