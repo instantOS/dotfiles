@@ -80,3 +80,8 @@ set -o emacs
 
 # opencode
 export PATH="$HOME/.opencode/bin:$PATH"
+
+export PATH="$HOME/.bun/bin:$PATH"
+
+# bun completions
+[ -s "/home/benjamin/.bun/_bun" ] && source "/home/benjamin/.bun/_bun"
