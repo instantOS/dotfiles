@@ -8,6 +8,13 @@
     exec tmux &&
     exit
 
+export BUN_INSTALL="$HOME/.bun"
+
+# Consolidated PATH with all necessary directories
+export PATH="$HOME/.cargo/bin:$HOME/.local/bin:$HOME/node_modules/.bin:$PATH"
+export PATH="$PATH:~/bin:$BUN_INSTALL/bin:$HOME/.opencode/bin"
+
+eval "$(mise activate zsh)"
 
 zstyle ':fzf-tab:*' use-fzf-default-opts yes
 export FZF_DEFAULT_OPTS=" \
@@ -18,9 +25,6 @@ export FZF_DEFAULT_OPTS=" \
 --multi"
 
 bindkey -e
-
-# mise
-eval "$(mise activate zsh)"
 
 ZIM_CONFIG_FILE=~/.config/zsh/zimrc
 ZIM_HOME=~/.zim
@@ -39,11 +43,12 @@ source ${ZIM_HOME}/init.zsh
 
 source <(COMPLETE=zsh ins)
 
-export PATH="$PATH:~/bin"
+export ANSIBLE_VAULT_PASSWORD_FILE=/tmp/ansible-vault-pass."$USER"
+alias anspass="bash $HOME/.paperbenni/ansible-vault-agent.sh"
 
+alias lg=lazygit
 alias v=nvim
 alias g=git
-alias lg=lazygit
 alias vv="nvim ."
 alias open="xdg-open"
 alias i=ins
@@ -52,15 +57,8 @@ alias j=just
 
 eval "$(starship init zsh)"
 
-sshh() {
-    if ! ssh-add -l &>/dev/null; then
-        if [ -z "$SSH_AGENT_PID" ] || ! ps -p "$SSH_AGENT_PID"; then
-            eval "$(ssh-agent)"
-        fi
-        ssh-add -l 2>/dev/null | grep -q 'RSA' || ssh-add
-    fi
-}
 
+# yazi wrapper which keeps cwd
 function y() {
 	local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
 	yazi "$@" --cwd-file="$tmp"
@@ -70,9 +68,11 @@ function y() {
 	rm -f -- "$tmp"
 }
 
-export PATH="$HOME/node_modules/.bin:$PATH"
-export PATH="$HOME/.local/bin:$PATH"
-export PATH="$HOME/.cargo/bin:$PATH"
+set -o emacs
+
+
+# bun completions
+[ -s "$HOME/.bun/_bun" ] && source "$HOME/.bun/_bun"
 
 command_not_found_handler() {
     if command -v commandfinder >/dev/null 2>&1; then
@@ -83,7 +83,3 @@ command_not_found_handler() {
     fi
 }
 
-set -o emacs
-
-# opencode
-export PATH="$HOME/.opencode/bin:$PATH"
