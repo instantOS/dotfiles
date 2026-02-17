@@ -4,7 +4,7 @@ theme = "ctp-mocha"
 [theme.overrides]
 separator = "\ue0b4 \ue0b6"
 start_separator = "\ue0b6"
-end_separator = "\ue0b4"
+end_separator = "\ue0b4 "
 separator_bg = "#1e1e2e"
 separator_fg = "auto"
 
@@ -36,11 +36,32 @@ format = " $icon $mem_avail "
 [[block]]
 block = "load"
 interval = 1
+[[block.click]]
+button = "left"
+cmd = "kitty btm"
 
 [[block]]
 block = "cpu"
 interval = 1
+[[block.click]]
+button = "left"
+cmd = "kitty btm"
+
+[[block]]
+block = "sound"
+format = " $icon $volume "
+[[block.click]]
+button = "left"
+cmd = "pavucontrol"
 
 [[block]]
 block = "time"
 format = " $icon $timestamp.datetime(f:'%H:%M') "
+
+[[block]]
+block = "custom"
+interval = 100
+command = "echo "
+[[block.click]]
+button = "left"
+cmd = "ins settings --gui"
