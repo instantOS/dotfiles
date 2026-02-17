@@ -8,6 +8,8 @@
     exec tmux &&
     exit
 
+export SSH_AUTH_SOCK=$XDG_RUNTIME_DIR/ssh-agent.socket
+
 export BUN_INSTALL="$HOME/.bun"
 
 # Consolidated PATH with all necessary directories
