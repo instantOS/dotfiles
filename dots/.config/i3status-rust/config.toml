@@ -1,0 +1,46 @@
+[theme]
+theme = "ctp-mocha"
+
+[theme.overrides]
+separator = "\ue0b4 \ue0b6"
+start_separator = "\ue0b6"
+end_separator = "\ue0b4"
+separator_bg = "#1e1e2e"
+separator_fg = "auto"
+
+[icons]
+icons = "awesome6"
+
+[icons.overrides]
+mem = "\U000f035b"
+cpu = "\U000f0ee0"
+
+[[block]]
+block = "battery"
+driver = "upower"
+device = "DisplayDevice"
+format = " $icon $percentage{ $time_remaining.dur(hms:true)|} "
+full_format = " $icon $percentage "
+not_charging_format = " $icon $percentage "
+full_threshold = 100
+
+[[block]]
+block = "disk_space"
+path = "/"
+format = " $icon $available "
+
+[[block]]
+block = "memory"
+format = " $icon $mem_avail "
+
+[[block]]
+block = "load"
+interval = 1
+
+[[block]]
+block = "cpu"
+interval = 1
+
+[[block]]
+block = "time"
+format = " $icon $timestamp.datetime(f:'%H:%M') "
