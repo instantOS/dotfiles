@@ -8,7 +8,12 @@
     exec tmux &&
     exit
 
-export PATH="$HOME/.cargo/bin:$HOME/.local/bin:$PATH"
+export BUN_INSTALL="$HOME/.bun"
+
+# Consolidated PATH with all necessary directories
+export PATH="$HOME/.cargo/bin:$HOME/.local/bin:$HOME/node_modules/.bin:$PATH"
+export PATH="$PATH:~/bin:$BUN_INSTALL/bin:$HOME/.opencode/bin"
+
 eval "$(mise activate zsh)"
 
 zstyle ':fzf-tab:*' use-fzf-default-opts yes
@@ -69,14 +74,12 @@ set -o emacs
 # bun completions
 [ -s "$HOME/.bun/_bun" ] && source "$HOME/.bun/_bun"
 
-
-export BUN_INSTALL="$HOME/.bun"
-export PATH="$BUN_INSTALL/bin:$PATH"
-
-export PATH="$HOME/node_modules/.bin:$PATH"
-export PATH="$PATH:~/bin"
-export PATH="$HOME/.cargo/bin:$PATH"
-export PATH="$HOME/.opencode/bin:$PATH"
-
-command_not_found_handler() {which commandfinder && commandfinder $@}
+command_not_found_handler() {
+    if command -v commandfinder >/dev/null 2>&1; then
+        commandfinder "$@"
+    else
+        printf "zsh: command not found: %s\n" "$1" >&2
+        return 127
+    fi
+}
 
