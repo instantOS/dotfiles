@@ -275,13 +275,10 @@ bindsym $mod+r mode "resize"
 
 bar {
     position top
-    separator_symbol "|"
+    separator_symbol ""
     workspace_min_width 40
-    font JetBrainsMono Nerd Font
-    # When the status_command prints a new line to stdout, swaybar updates.
-    # The default just shows the current date and time.
-    # status_command while date +'%Y-%m-%d %I:%M %p'; do sleep 1; done
-    status_command i3status
+    font pango:JetBrainsMono Nerd Font 12
+    status_command i3status-rs
 
     colors {
         statusline $text
@@ -319,3 +316,4 @@ exec clipcatd
 # BEGIN instantCLI integration (managed automatically)
 include ~/.config/sway/instant
 # END instantCLI integration
+
