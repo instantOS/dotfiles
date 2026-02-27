@@ -28,6 +28,9 @@ full_threshold = 100
 block = "disk_space"
 path = "/"
 format = " $icon $available "
+[[block.click]]
+button = "left"
+cmd = "xdg-open ~/"
 
 [[block]]
 block = "memory"
