@@ -2,9 +2,9 @@
 theme = "ctp-mocha"
 
 [theme.overrides]
-separator = "\ue0b4 \ue0b6"
-start_separator = "\ue0b6"
-end_separator = "\ue0b4 "
+# separator = "\ue0b4 \ue0b6"
+# start_separator = "\ue0b6"
+# end_separator = "\ue0b4 "
 separator_bg = "#1e1e2e"
 separator_fg = "auto"
 
@@ -20,7 +20,7 @@ block = "battery"
 driver = "upower"
 device = "DisplayDevice"
 format = " $icon $percentage{ $time_remaining.dur(hms:true)|} "
-full_format = " $icon $percentage "
+full_format = " $icon $percentage aa"
 not_charging_format = " $icon $percentage "
 full_threshold = 100
 
