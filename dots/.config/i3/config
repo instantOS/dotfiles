@@ -154,7 +154,6 @@ bindsym $mod+d focus mode_toggle
 
 # focus the parent container
 bindsym $mod+Shift+a focus parent
-bindsym $mod+a exec instantassist
 
 # focus the child container
 #bindsym $mod+d focus child
