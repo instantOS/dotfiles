@@ -61,7 +61,6 @@ exec --no-startup-id dunst
 
 exec --no-startup-id autorandr --load instantos
 exec --no-startup-id nvidia-settings -l
-exec --no-startup-id setxkbmap -option caps:swapescape
 
 # Use pactl to adjust volume in PulseAudio.
 set $refresh_i3status killall -SIGUSR1 i3status
@@ -96,11 +95,14 @@ bindsym $mod+Ctrl+l exec sleep 0.1 && ilock
 # start instantmenu smartrun (a program launcher)
 bindsym $mod+space exec --no-startup-id instantmenu_smartrun
 bindsym $mod+Ctrl+c exec --no-startup-id instantsettings
-bindsym $mod+Ctrl+e exec --no-startup-id instantskippy
+bindsym XF86MonBrightnessUp exec brightnessctl set +5%
+bindsym XF86MonBrightnessDown exec brightnessctl set 5%-
 bindsym $mod+y exec --no-startup-id appmenu
 
-bindsym $mod+Mod1+space exec --no-startup-id instantkeyswitch
+# Keyboard layout switching (cycles through configured layouts)
+bindsym $mod+Mod1+space exec setxkbmap -option grp:shift_caps_toggle && setxkbmap -query | grep -q "us" && setxkbmap de,us || setxkbmap us,de
 bindsym $mod+Shift+v exec --no-startup-id instantclipmenu
+exec --no-startup-id setxkbmap -option caps:swapescape
 # A more modern dmenu replacement is rofi:
 # bindcode $mod+40 exec "rofi -modi drun,run -show drun"
 # There also is i3-dmenu-desktop which only displays applications shipping a
@@ -223,16 +225,14 @@ bindsym $mod+Shift+e exec "i3-nagbar -t warning -m 'You pressed the exit shortcu
 
 # resize window (you can also use the mouse for that)
 mode "resize" {
-        # These bindings trigger as soon as you enter the resize mode
-
         # Pressing left will shrink the window’s width.
         # Pressing right will grow the window’s width.
         # Pressing up will shrink the window’s height.
         # Pressing down will grow the window’s height.
-        bindsym j resize shrink width 10 px or 10 ppt
-        bindsym k resize grow height 10 px or 10 ppt
-        bindsym l resize shrink height 10 px or 10 ppt
-        bindsym semicolon resize grow width 10 px or 10 ppt
+        bindsym h resize shrink width 10 px or 10 ppt
+        bindsym j resize grow height 10 px or 10 ppt
+        bindsym k resize shrink height 10 px or 10 ppt
+        bindsym l resize grow width 10 px or 10 ppt
 
         # same bindings, but for the arrow keys
         bindsym Left resize shrink width 10 px or 10 ppt
@@ -247,6 +247,11 @@ mode "resize" {
 }
 
 bindsym $mod+r mode "resize"
+
+mode "passthrough" {
+    bindsym $mod+Pause mode "default"
+}
+bindsym $mod+Pause mode "passthrough"
 
 
 set $base00 #101218
@@ -272,7 +277,7 @@ default_border pixel 3
 bar {
 	position top 
     separator_symbol "|"
-    status_command i3status
+    status_command i3status-rs
     workspace_min_width 40
     tray_padding 2
     font pango:JetBrainsMono Nerd Font
