@@ -40,32 +40,6 @@ return {
 
         ]])
 
-		-- Function to disable Treesitter highlighting for Markdown files
-		function disable_treesitter_for_markdown()
-			-- Disable Treesitter highlighting for Markdown filetype
-			vim.api.nvim_create_autocmd({ "FileType" }, {
-				pattern = "markdown",
-				callback = function()
-					vim.cmd("TSBufDisable highlight")
-				end,
-			})
-
-			-- Find all currently open Markdown buffers and disable Treesitter for them
-			local buffers = vim.api.nvim_list_bufs()
-			for _, buf in ipairs(buffers) do
-				if vim.api.nvim_buf_is_valid(buf) then
-					local ft = vim.api.nvim_buf_get_option(buf, "filetype")
-					if ft == "markdown" then
-						vim.api.nvim_buf_call(buf, function()
-							vim.cmd("TSBufDisable highlight")
-						end)
-					end
-				end
-			end
-		end
-
-		disable_treesitter_for_markdown()
-
 		vim.api.nvim_create_autocmd("FileType", {
 			pattern = "markdown",
 			callback = function()

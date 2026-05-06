@@ -1,10 +1,12 @@
 return {
 	"nvim-treesitter/nvim-treesitter",
+	branch = "main",
 	build = ":TSUpdate",
-	event = { "VeryLazy", "BufReadPost", "BufWritePost", "BufNewFile" },
-	opts = {
-		ensure_installed = {
-			"bash",
+	lazy = false,
+	config = function()
+		require("nvim-treesitter").setup()
+
+		local enabled_filetypes = {
 			"c",
 			"cpp",
 			"css",
@@ -17,36 +19,33 @@ return {
 			"javascript",
 			"json",
 			"lua",
-			"norg",
+			"make",
 			"nginx",
+			"python",
 			"regex",
+			"rust",
+			"sh",
 			"sql",
+			"svelte",
 			"sway",
 			"terraform",
+			"toml",
+			"typescript",
+			"typescriptreact",
 			"udev",
 			"zathurarc",
 			"zig",
-			"make",
-			"norg",
-			"python",
-			"rust",
-			"markdown",
-			"markdown_inline",
-			"svelte",
-			"toml",
-			"tsx",
-			"typescript",
-		},
-		ignore_install = { "latex" },
-		sync_install = true,
-		highlight = {
-			enable = true,
-			additional_vim_regex_highlighting = false,
-			disable = { "latex" },
-		},
-		indent = { enable = true },
-	},
-	config = function(_, opts)
-		require("nvim-treesitter.configs").setup(opts)
+		}
+
+		vim.api.nvim_create_autocmd("FileType", {
+			group = vim.api.nvim_create_augroup("UserTreesitter", { clear = true }),
+			pattern = enabled_filetypes,
+			callback = function(args)
+				pcall(vim.treesitter.start, args.buf)
+				vim.bo[args.buf].indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+				vim.wo.foldexpr = "v:lua.vim.treesitter.foldexpr()"
+				vim.wo.foldmethod = "expr"
+			end,
+		})
 	end,
 }

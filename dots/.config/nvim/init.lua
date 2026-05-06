@@ -127,7 +127,7 @@ opt.scrolloff = 6
 opt.foldenable = false
 
 opt.foldmethod = "expr"
-opt.foldexpr = "nvim_treesitter#foldexpr()"
+opt.foldexpr = "v:lua.vim.treesitter.foldexpr()"
 
 -- require("indent_blankline").setup {
 --     -- for example, context is off by default, use this to turn it on
