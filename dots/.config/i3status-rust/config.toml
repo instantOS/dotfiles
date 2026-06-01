@@ -20,7 +20,7 @@ block = "battery"
 driver = "upower"
 device = "DisplayDevice"
 format = " $icon $percentage{ $time_remaining.dur(hms:true)|} "
-full_format = " $icon $percentage aa"
+full_format = " $icon $percentage "
 not_charging_format = " $icon $percentage "
 full_threshold = 100
 

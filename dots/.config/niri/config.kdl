@@ -11,7 +11,7 @@ input {
         xkb {
             // You can set rules, model, layout, variant and options.
             // For more information, see xkeyboard-config(7).
-            layout "us,de"
+            layout "de,us"
             options "grp:shift_caps_toggle,caps:swapescape"
             // For example:
             // layout "us,ru"
@@ -615,6 +615,9 @@ binds {
     // Powers off the monitors. To turn them back on, do any input like
     // moving the mouse or pressing any other key.
     Mod+Shift+P { power-off-monitors; }
+
+    // Switch keyboard layout.
+    Super+Alt+Space { switch-layout "next"; }
 }
 
 spawn-at-startup "xwayland-satellite"

@@ -49,6 +49,7 @@ export ANSIBLE_VAULT_PASSWORD_FILE=/tmp/ansible-vault-pass."$USER"
 alias anspass="bash $HOME/.paperbenni/ansible-vault-agent.sh"
 
 alias lg=lazygit
+alias pls=sudo
 alias v=nvim
 alias g=git
 alias vv="nvim ."
