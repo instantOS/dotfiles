@@ -41,10 +41,6 @@ return {
 	},
 	opts = {
 		legacy_commands = false,
-		completion = {
-			blink = true,
-			nvim_cmp = false,
-		},
 		workspaces = {
 			{
 				name = "wiki",
