@@ -10,11 +10,7 @@
 
 export SSH_AUTH_SOCK=$XDG_RUNTIME_DIR/ssh-agent.socket
 
-export BUN_INSTALL="$HOME/.bun"
-
-# Consolidated PATH with all necessary directories
 export PATH="$HOME/.cargo/bin:$HOME/.local/bin:$HOME/node_modules/.bin:$PATH"
-export PATH="$PATH:~/bin:$BUN_INSTALL/bin:$HOME/.opencode/bin:$HOME/go/bin"
 
 eval "$(mise activate zsh)"
 
