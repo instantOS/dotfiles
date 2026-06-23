@@ -12,18 +12,16 @@ return {
 			vim.lsp.inline_completion.enable(true)
 		end
 		require("mason").setup()
-		require("mason-lspconfig").setup({
-			automatic_enable = {
-				exclude = {
-					"harper_ls",
-					"lua_ls",
-				},
-			},
-		})
 		local capabilities = require("blink.cmp").get_lsp_capabilities()
 
 		vim.lsp.config("*", {
 			capabilities = capabilities,
+		})
+
+		vim.lsp.config("tinymist", {
+			settings = {
+				projectResolution = "lockDatabase",
+			},
 		})
 
 		vim.lsp.config["yamlls"] = {
@@ -36,5 +34,14 @@ return {
 				},
 			},
 		}
+
+		require("mason-lspconfig").setup({
+			automatic_enable = {
+				exclude = {
+					"harper_ls",
+					"lua_ls",
+				},
+			},
+		})
 	end,
 }
