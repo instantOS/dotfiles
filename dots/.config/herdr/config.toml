@@ -1,0 +1,23 @@
+onboarding = false
+[ui.toast]
+delivery = "herdr"
+
+[ui]
+agent_panel_scope = "all"
+mobile_width_threshold = 70
+
+[terminal]
+default_shell = "zsh"
+
+[keys]
+last_pane = "prefix+tab"
+
+[[keys.command]]
+key = "prefix+alt+g"
+type = "pane"
+command = "lazygit"
+description = "run lazygit"
+
+[theme]
+name = "catppuccin"
+
