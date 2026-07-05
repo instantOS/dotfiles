@@ -273,6 +273,9 @@ bindsym $mod+r mode "resize"
 #
 # Read `man 5 sway-bar` for more information about this section.
 
+# Window title font
+font pango:Inter 12
+
 bar {
     position top
     separator_symbol ""
