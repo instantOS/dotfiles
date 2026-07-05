@@ -1,0 +1,2 @@
+colorscheme catppuccin_mocha
+
