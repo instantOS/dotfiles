@@ -19,7 +19,7 @@ symbol = " "
 symbol = " "
 
 [directory]
-read_only = " 󰎾"
+read_only = " \U000f03be"
 
 [docker_context]
 symbol = " "
