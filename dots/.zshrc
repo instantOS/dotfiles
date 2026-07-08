@@ -20,6 +20,11 @@ bindkey -e
 if [[ ! -s "$HOME/.config/sheldon/source.zsh" \
    || "$HOME/.config/sheldon/plugins.toml" -nt "$HOME/.config/sheldon/source.zsh" \
    || "$HOME/.local/share/sheldon/plugins.lock" -nt "$HOME/.config/sheldon/source.zsh" ]]; then
+  if ! command -v sheldon &>/dev/null; then
+    echo "Sheldon not found. Installing via mise..."
+    mise use -g sheldon
+    eval "$(mise env)"
+  fi
   local tmp_cache=$(mktemp)
   sheldon source | while read -r line; do
     if [[ "$line" =~ ^source\ \"(.*)\" ]]; then
