@@ -1,0 +1,65 @@
+shell = "zsh"
+
+# 1. Add completion directories to fpath first
+[plugins.zsh-completions]
+github = "zsh-users/zsh-completions"
+dir = "src"
+apply = ["fpath"]
+
+# 2. Run compinit immediately after fpath is configured to define `compdef`
+[plugins.compinit]
+inline = """
+autoload -Uz compinit
+if [[ -n "${ZDOTDIR:-$HOME}/.zcompdump(#qN.m+1)" ]]; then
+  compinit
+else
+  compinit -C
+fi
+"""
+
+# 3. Configure standard completion styling and behaviors
+[plugins.completion-styles]
+inline = """
+zstyle ':completion:*' menu select
+zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}' 'r:|=*' 'l:|=*'
+zstyle ':completion:*' use-cache on
+zstyle ':completion:*' cache-path "${XDG_CACHE_HOME:-$HOME/.cache}/zsh/zcompcache"
+"""
+
+# 4. Load Oh My Zsh library defaults
+[plugins.omz-directories]
+github = "ohmyzsh/ohmyzsh"
+dir = "lib"
+use = ["directories.zsh"]
+
+[plugins.omz-history]
+github = "ohmyzsh/ohmyzsh"
+dir = "lib"
+use = ["history.zsh"]
+
+[plugins.omz-key-bindings]
+github = "ohmyzsh/ohmyzsh"
+dir = "lib"
+use = ["key-bindings.zsh"]
+
+[plugins.omz-theme-and-appearance]
+github = "ohmyzsh/ohmyzsh"
+dir = "lib"
+use = ["theme-and-appearance.zsh"]
+
+# 5. Load external tools and integrations
+[plugins.zoxide]
+inline = 'eval "$(zoxide init zsh)"'
+
+[plugins.ohmyzsh-fzf]
+github = "ohmyzsh/ohmyzsh"
+dir = "plugins/fzf"
+
+[plugins.zsh-autosuggestions]
+github = "zsh-users/zsh-autosuggestions"
+
+[plugins.zsh-syntax-highlighting]
+github = "zsh-users/zsh-syntax-highlighting"
+
+[plugins.fzf-tab]
+github = "Aloxaf/fzf-tab"

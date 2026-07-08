@@ -1,12 +1,4 @@
 #!/usr/bin/zsh
-#
-# paperbenni's default zshrc
-
-[ -n "$USETMUX" ] && [ -z "$TMUX" ] &&
-    ! [ "$TERM_PROGRAM" = "vscode" ] &&
-    command -v tmux &>/dev/null &&
-    exec tmux &&
-    exit
 
 export SSH_AUTH_SOCK=$XDG_RUNTIME_DIR/ssh-agent.socket
 
@@ -24,38 +16,47 @@ export FZF_DEFAULT_OPTS=" \
 
 bindkey -e
 
-ZIM_CONFIG_FILE=~/.config/zsh/zimrc
-ZIM_HOME=~/.zim
-# Download zimfw plugin manager if missing.
-if [[ ! -e ${ZIM_HOME}/zimfw.zsh ]]; then
-  curl -fsSL --create-dirs -o ${ZIM_HOME}/zimfw.zsh \
-      https://github.com/zimfw/zimfw/releases/latest/download/zimfw.zsh
+# Sheldon plugin manager setup (compiled single-file cache)
+if [[ ! -s "$HOME/.config/sheldon/source.zsh" \
+   || "$HOME/.config/sheldon/plugins.toml" -nt "$HOME/.config/sheldon/source.zsh" \
+   || "$HOME/.local/share/sheldon/plugins.lock" -nt "$HOME/.config/sheldon/source.zsh" ]]; then
+  local tmp_cache=$(mktemp)
+  sheldon source | while read -r line; do
+    if [[ "$line" =~ ^source\ \"(.*)\" ]]; then
+      local filepath="${match[1]}"
+      if [[ "$filepath" == */ohmyzsh/ohmyzsh/lib/* ]]; then
+        cat "$filepath" >> "$tmp_cache"
+        echo "" >> "$tmp_cache"
+      else
+        echo "$line" >> "$tmp_cache"
+      fi
+    else
+      echo "$line" >> "$tmp_cache"
+    fi
+  done
+  # Statically cache starship prompt setup
+  if command -v starship &>/dev/null; then
+    starship init zsh >> "$tmp_cache"
+    echo "" >> "$tmp_cache"
+  fi
+  mv "$tmp_cache" "$HOME/.config/sheldon/source.zsh"
+  zcompile "$HOME/.config/sheldon/source.zsh"
 fi
-
-# Install missing modules and update ${ZIM_HOME}/init.zsh if missing or outdated.
-if [[ ! ${ZIM_HOME}/init.zsh -nt ${ZIM_CONFIG_FILE:-${ZDOTDIR:-${HOME}}/.zimrc} ]]; then
-  source ${ZIM_HOME}/zimfw.zsh init
-fi
-
-source ${ZIM_HOME}/init.zsh
+source "$HOME/.config/sheldon/source.zsh"
 
 source <(COMPLETE=zsh ins)
 
 export ANSIBLE_VAULT_PASSWORD_FILE=/tmp/ansible-vault-pass."$USER"
+
+
 alias anspass="bash $HOME/.paperbenni/ansible-vault-agent.sh"
-
-alias lg=lazygit
-alias pls=sudo
-alias v=nvim
 alias g=git
-alias vv="nvim ."
-alias open="xdg-open"
 alias i=ins
-
 alias j=just
-
-eval "$(starship init zsh)"
-
+alias lg=lazygit
+alias open="xdg-open"
+alias v=nvim
+alias vv="nvim ."
 
 # yazi wrapper which keeps cwd
 function y() {
@@ -69,9 +70,11 @@ function y() {
 
 set -o emacs
 
-
 # bun completions
 [ -s "$HOME/.bun/_bun" ] && source "$HOME/.bun/_bun"
+# bun
+export BUN_INSTALL="$HOME/.bun"
+export PATH="$BUN_INSTALL/bin:$PATH"
 
 command_not_found_handler() {
     if command -v commandfinder >/dev/null 2>&1; then
