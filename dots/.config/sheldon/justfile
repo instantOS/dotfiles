@@ -1,0 +1,13 @@
+default:
+    @just --list --justfile {{justfile()}}
+
+# Fetch the latest commits for all plugins, update plugins.toml, and rebuild compilation cache
+bump:
+    ./bump.py
+    rm -f source.zsh source.zsh.zwc
+    # Trigger Zsh to automatically run your Zshrc cache builder
+    env TERM=xterm-256color zsh -i -c 'exit'
+    # Compile all cloned plugin scripts to bytecode for maximum performance
+    find ~/.local/share/sheldon/repos -name "*.zsh" -o -name "*.plugin.zsh" | while read file; do \
+        zsh -c "zcompile -R '$file'"; \
+    done
