@@ -14,6 +14,7 @@ icons = "awesome6"
 [icons.overrides]
 mem = "\U000f035b"
 cpu = "\U000f0ee0"
+volume_muted = "\ueee8"
 
 [[block]]
 block = "battery"
@@ -52,7 +53,7 @@ cmd = "kitty btm"
 
 [[block]]
 block = "sound"
-format = " $icon $volume "
+format = " $icon {$volume|} "
 [[block.click]]
 button = "left"
 cmd = "pavucontrol"
