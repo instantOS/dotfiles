@@ -3,7 +3,6 @@ onboarding = false
 delivery = "herdr"
 
 [ui]
-agent_panel_scope = "all"
 mobile_width_threshold = 70
 
 [terminal]

@@ -625,3 +625,7 @@ spawn-at-startup "xwayland-satellite"
 environment {
     DISPLAY ":0"
 }
+
+// BEGIN instantCLI integration (managed automatically)
+include "instant.kdl"
+// END instantCLI integration
