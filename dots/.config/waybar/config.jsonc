@@ -9,7 +9,7 @@
   "margin-right": 10,
   "spacing": 6,
 
-  "modules-left": ["hyprland/workspaces"],
+  "modules-left": ["custom/instantos", "hyprland/workspaces"],
   "modules-center": ["hyprland/window"],
   "modules-right": [
     "pulseaudio",
@@ -20,6 +20,12 @@
     "battery",
     "clock"
   ],
+
+  "custom/instantos": {
+    "format": " ",
+    "on-click": "instantstartmenu",
+    "tooltip-format": "Open instantOS menu"
+  },
 
   "hyprland/workspaces": {
     "format": "{name}",

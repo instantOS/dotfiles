@@ -49,6 +49,16 @@ button:hover {
   color: @text;
 }
 
+#custom-instantos {
+  min-width: 22px;
+  margin-left: 9px;
+  margin-right: 1px;
+  background-image: url("instantos.svg");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 22px 22px;
+}
+
 #workspaces { padding: 4px; }
 
 #workspaces button {
@@ -59,6 +69,11 @@ button:hover {
 }
 
 #workspaces button.empty { color: @overlay0; }
+
+#workspaces button:not(.empty):not(.active) {
+  color: @lavender;
+  background: @surface0;
+}
 
 #workspaces button.visible {
   color: @blue;
