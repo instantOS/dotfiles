@@ -77,6 +77,29 @@
 (setq make-backup-files nil
       auto-save-default nil)
 
+;; Deferred line numbers + hl-line to keep TUI ~0.33s (appear after idle)
+(add-hook 'window-setup-hook
+          (lambda ()
+            (run-with-timer 0.3 nil
+              (lambda ()
+                (global-display-line-numbers-mode 1)
+                (global-hl-line-mode 1)))))
+;; Daemon: window-setup never fires, enable on first frame (any tty/graphic)
+(add-hook 'after-make-frame-functions
+          (lambda (frame)
+            (run-with-timer 0.2 nil
+              (lambda ()
+                (when (frame-live-p frame)
+                  (global-display-line-numbers-mode 1)
+                  (global-hl-line-mode 1))))))
+(with-eval-after-load 'server
+  (add-hook 'server-after-make-frame-hook
+            (lambda ()
+              (run-with-timer 0.2 nil
+                (lambda ()
+                  (global-display-line-numbers-mode 1)
+                  (global-hl-line-mode 1))))))
+
 ;; -------------------------------------------------------------------
 ;;; 5. Evil + Leader
 ;; -------------------------------------------------------------------
