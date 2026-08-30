@@ -81,7 +81,7 @@
     "fs" '(save-buffer :wk "save")
     "fr" '(vertico-repeat :wk "repeat")
     "b"  '(:ignore t :wk "buffer")
-    "bb" '(switch-to-buffer :wk "switch")
+    "bb" '(consult-buffer :wk "switch (consult)")
     "bd" '(kill-current-buffer :wk "kill")
     "o"  '(:ignore t :wk "obsidian/wiki")
     "oo" '(obsidian-jump :wk "jump note")
@@ -117,8 +117,18 @@
   (org-agenda-files '("~/org/inbox.org" "~/org/projects.org")))
 
 ;; -------------------------------------------------------------------
-;;; 7. Obsidian (vault: ~/wiki)
+;;; 7. Markdown & Obsidian (vault: ~/wiki)
 ;; -------------------------------------------------------------------
+(use-package markdown-mode
+  :defer t
+  :mode ("\\.md\\'" "\\.markdown\\'")
+  :hook (markdown-mode . visual-line-mode)
+  :custom
+  (markdown-fontify-code-blocks-natively t)
+  (markdown-hide-markup t)
+  (markdown-italic-underscore t)
+  (markdown-asymmetric-header t))
+
 (use-package obsidian
   :defer t
   :custom
@@ -156,6 +166,13 @@
   :config
   (vertico-prescient-mode 1)
   (prescient-persist-mode 1))
+
+(use-package consult
+  :defer t
+  :bind (("C-x b" . consult-buffer)
+         ("M-s r" . consult-ripgrep)
+         ("M-s l" . consult-line))
+  :custom (consult-preview-key "M-."))
 
 ;; -------------------------------------------------------------------
 ;;; 9. Treesitter
