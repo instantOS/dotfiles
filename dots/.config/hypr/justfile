@@ -1,0 +1,23 @@
+# Hyprland config helpers
+
+default: fmt check
+
+fmt:
+    stylua hyprland.lua
+
+check:
+    stylua --check hyprland.lua
+    -hyprctl configerrors
+
+reload:
+    hyprctl reload
+
+fmt-check:
+    stylua --check hyprland.lua
+
+validate:
+    hyprctl configerrors
+
+# Format and validate in one go
+fmt-validate: fmt
+    hyprctl configerrors
