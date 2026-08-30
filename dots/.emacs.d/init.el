@@ -3,13 +3,11 @@
 ;; -------------------------------------------------------------------
 ;;; 1. Startup Optimization
 ;; -------------------------------------------------------------------
-(setq gc-cons-threshold most-positive-fixnum
-      gc-cons-percentage 0.6)
+;; GC is already set for startup in early-init.el; restore here after init.
 (add-hook 'emacs-startup-hook
           (lambda ()
             (setq gc-cons-threshold (* 16 1024 1024)
                   gc-cons-percentage 0.1)))
-(setq native-comp-async-report-warnings-errors 'silent)
 
 ;; -------------------------------------------------------------------
 ;;; 2. Package Management (MELPA)
@@ -22,48 +20,37 @@
 (setq use-package-always-ensure t
       use-package-always-defer t
       use-package-expand-minimally t)
-(setq package-quickstart t)
 
 ;; -------------------------------------------------------------------
 ;;; 3. Appearance & Theme
 ;; -------------------------------------------------------------------
-;; catppuccin-flavor must be set *before* the theme loads
-(setq catppuccin-flavor 'mocha) ; mocha, macchiato, frappe, latte
-
 ;; Ensure installed but don't load eagerly - TUI cold start stays ~0.33s
-;; (global use-package-always-defer/ensure already handles this, :defer keeps it lazy)
 (use-package catppuccin-theme
   :defer t
-  :init (setq catppuccin-flavor 'mocha))
+  :init (setq catppuccin-flavor 'mocha)) ; mocha, macchiato, frappe, latte
 
 (defun my/load-catppuccin ()
   "Load catppuccin if available. Safe to call repeatedly."
   (when (require 'catppuccin-theme nil t)
     (load-theme 'catppuccin t)))
 
-;; Preserve original deferred behaviour: open without theme, load 0.3s
-;; after window-setup when Emacs is interactive (keeps cold TUI ~0.33s).
-;; Use run-with-timer (not idle) so pgtk/Wayland reliably fires.
-(add-hook 'window-setup-hook
-          (lambda ()
-            (run-with-timer 0.3 nil #'my/load-catppuccin)))
+(defun my/deferred-load-catppuccin (&optional frame)
+  "Load catppuccin 0.2s after FRAME (or the selected frame) is ready.
+Keeps the deferred \"load when interactive\" behaviour; use run-with-timer
+(not idle) so pgtk/Wayland reliably fires."
+  (run-with-timer 0.2 nil
+                  (lambda ()
+                    (let ((target (or frame (selected-frame))))
+                      (when (frame-live-p target)
+                        (with-selected-frame target
+                          (my/load-catppuccin)))))))
 
-;; daemon / emacsclient on Wayland: window-setup-hook does NOT fire for
-;; frames created after init, so hook server frames explicitly.
-;; Use timers to keep the deferred "load when interactive" behaviour.
-(with-eval-after-load 'server
-  (add-hook 'server-after-make-frame-hook
-            (lambda ()
-              (when (display-graphic-p (selected-frame))
-                (run-with-timer 0.2 nil #'my/load-catppuccin)))))
-(add-hook 'after-make-frame-functions
-          (lambda (frame)
-            (when (display-graphic-p frame)
-              (run-with-timer 0.2 nil
-                              (lambda ()
-                                (when (frame-live-p frame)
-                                  (with-selected-frame frame
-                                    (my/load-catppuccin))))))))
+;; Normal session: window-setup-hook fires for the initial frame, which
+;; is created before this file's hooks exist.
+(add-hook 'window-setup-hook #'my/deferred-load-catppuccin)
+;; Subsequent frames (incl. daemon/emacsclient): after-make-frame-functions
+;; covers every frame created after init, so no server hook is needed.
+(add-hook 'after-make-frame-functions #'my/deferred-load-catppuccin)
 
 ;; -------------------------------------------------------------------
 ;;; 4. Basic UI
@@ -71,34 +58,24 @@
 (setq inhibit-startup-message t)
 (tool-bar-mode -1)
 (menu-bar-mode -1)
-(when (fboundp 'scroll-bar-mode) (scroll-bar-mode -1))
+(scroll-bar-mode -1)
 (column-number-mode 1)
 (show-paren-mode 1)
 (setq make-backup-files nil
       auto-save-default nil)
 
 ;; Deferred line numbers + hl-line to keep TUI ~0.33s (appear after idle)
-(add-hook 'window-setup-hook
-          (lambda ()
-            (run-with-timer 0.3 nil
-              (lambda ()
-                (global-display-line-numbers-mode 1)
-                (global-hl-line-mode 1)))))
-;; Daemon: window-setup never fires, enable on first frame (any tty/graphic)
-(add-hook 'after-make-frame-functions
-          (lambda (frame)
-            (run-with-timer 0.2 nil
-              (lambda ()
-                (when (frame-live-p frame)
-                  (global-display-line-numbers-mode 1)
-                  (global-hl-line-mode 1))))))
-(with-eval-after-load 'server
-  (add-hook 'server-after-make-frame-hook
-            (lambda ()
-              (run-with-timer 0.2 nil
-                (lambda ()
-                  (global-display-line-numbers-mode 1)
-                  (global-hl-line-mode 1))))))
+(defun my/deferred-line-nums (&optional _frame)
+  "Enable line numbers and hl-line after a short delay.
+_FRAME is passed when called from after-make-frame-functions but ignored;
+both modes are global so they affect all frames once enabled."
+  (run-with-timer 0.2 nil
+                  (lambda ()
+                    (global-display-line-numbers-mode 1)
+                    (global-hl-line-mode 1))))
+
+(add-hook 'window-setup-hook #'my/deferred-line-nums)
+(add-hook 'after-make-frame-functions #'my/deferred-line-nums)
 
 ;; -------------------------------------------------------------------
 ;;; 5. Evil + Leader
@@ -119,11 +96,11 @@
 (defun my/find-vault-file ()
   "Find file in vault recursively via completing-read + vertico-prescient frecency."
   (interactive)
-  (let* ((dir (expand-file-name "~/wiki/vimwiki/"))
+  (let* ((dir (expand-file-name obsidian-directory))
          (files (directory-files-recursively dir "\\.md\\'"))
          (choice (completing-read "Vault: " files nil t)))
     (when choice
-      (find-file (expand-file-name choice dir)))))
+      (find-file choice))))
 
 ;; SPC leader via general.el
 (use-package general
@@ -199,12 +176,6 @@
 (with-eval-after-load 'markdown-mode
   (when markdown-header-scaling
     (markdown-update-header-faces t)))
-;; Fix markdown-mode substring bug for single-char link titles (persists if elpa reinstalled)
-(with-eval-after-load 'markdown-mode
-  (when (string-match-p "Args out of range" "")
-    nil)
-  ;; Patch already applied to elpa, keep elpa patch as primary
-  )
 
 (use-package obsidian
   :defer t
@@ -262,7 +233,6 @@
   :custom (treesit-auto-install 'prompt)
   :config (global-treesit-auto-mode))
 
-;;; init.el ends here
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -278,3 +248,5 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  )
+
+;;; init.el ends here
