@@ -92,11 +92,17 @@ both modes are global so they affect all frames once enabled."
   :demand t
   :config (evil-collection-init))
 
+;; Vault root - single source of truth for both the fast finder and obsidian.el.
+;; Defined here (early) because obsidian is deferred, but my/find-vault-file
+;; must work before the obsidian package has loaded.
+(defvar my/vault-dir "~/wiki/vimwiki"
+  "Root directory of the Obsidian vault.")
+
 ;; Fast vault finder (replaces obsidian-jump for 1800-file vault)
 (defun my/find-vault-file ()
   "Find file in vault recursively via completing-read + vertico-prescient frecency."
   (interactive)
-  (let* ((dir (expand-file-name obsidian-directory))
+  (let* ((dir (expand-file-name my/vault-dir))
          (files (directory-files-recursively dir "\\.md\\'"))
          (choice (completing-read "Vault: " files nil t)))
     (when choice
@@ -180,7 +186,7 @@ both modes are global so they affect all frames once enabled."
 (use-package obsidian
   :defer t
   :custom
-  (obsidian-directory "~/wiki/vimwiki")
+  (obsidian-directory my/vault-dir)
   (obsidian-inbox-directory "Inbox")
   (obsidian-daily-notes-directory "diary")
   (obsidian-use-update-timer t)
