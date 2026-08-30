@@ -92,6 +92,15 @@
   :demand t
   :config (evil-collection-init))
 
+;; Fast vault finder (replaces obsidian-jump for 1800-file vault)
+(defun my/find-vault-file ()
+  "Find file in vault via consult/find-file (fast, no 1700 scan)."
+  (interactive)
+  (let ((default-directory (expand-file-name "~/wiki/vimwiki/")))
+    (if (fboundp 'consult-find)
+        (consult-find default-directory)
+      (call-interactively #'find-file))))
+
 ;; SPC leader via general.el
 (use-package general
   :after evil
@@ -113,7 +122,7 @@
     "bb" '(consult-buffer :wk "switch (consult)")
     "bd" '(kill-current-buffer :wk "kill")
     "o"  '(:ignore t :wk "obsidian/wiki")
-    "oo" '(obsidian-jump :wk "jump note")
+    "oo" '(my/find-vault-file :wk "vault find (fast)")
     "on" '(obsidian-capture :wk "new note")
     "od" '(obsidian-daily-note :wk "daily")
     "ol" '(obsidian-insert-link :wk "insert link")
@@ -152,14 +161,20 @@
   :defer t
   :mode ("\\.md\\'" "\\.markdown\\'")
   :hook (markdown-mode . visual-line-mode)
+  :init
+  (setq markdown-header-scaling t
+        markdown-header-scaling-values '(1.8 1.6 1.4 1.2 1.0 1.0))
   :custom
-  (markdown-header-scaling t)
-  (markdown-header-scaling-values '(1.4 1.3 1.2 1.1 1.0 1.0))
   (markdown-fontify-code-blocks-natively t)
   (markdown-hide-markup t)
   (markdown-italic-underscore t)
   (markdown-asymmetric-header t)
   (markdown-enable-wiki-links t))
+
+;; Ensure header scaling takes effect even if markdown-mode was already loaded
+(with-eval-after-load 'markdown-mode
+  (when markdown-header-scaling
+    (markdown-update-header-faces t)))
 
 (use-package obsidian
   :defer t
@@ -167,8 +182,12 @@
   (obsidian-directory "~/wiki/vimwiki")
   (obsidian-inbox-directory "Inbox")
   (obsidian-daily-notes-directory "diary")
-  (obsidian-use-update-timer nil)
-  :config (global-obsidian-mode 1) ; enabled only when you first hit SPC o o (no scan at startup)
+  (obsidian-use-update-timer t)
+  (obsidian-update-idle-wait 1)
+  :config
+  (global-obsidian-mode 1)
+  ;; Populate cache in background so first SPC o o isn't empty long; 1700 files is heavy for obsidian.el
+  (run-with-idle-timer 0.5 nil #'obsidian-update)
   :bind (:map obsidian-mode-map
               ("C-c C-n" . obsidian-capture)
               ("C-c C-l" . obsidian-insert-link)
