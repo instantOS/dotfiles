@@ -25,16 +25,45 @@
 (setq package-quickstart t)
 
 ;; -------------------------------------------------------------------
-;;; 3. Appearance & Theme - lazy catppuccin after TUI is interactive
+;;; 3. Appearance & Theme
 ;; -------------------------------------------------------------------
-;; No :demand - load 0.3s after window-setup so cold TUI stays ~0.33s wall
+;; catppuccin-flavor must be set *before* the theme loads
+(setq catppuccin-flavor 'mocha) ; mocha, macchiato, frappe, latte
+
+;; Ensure installed but don't load eagerly - TUI cold start stays ~0.33s
+;; (global use-package-always-defer/ensure already handles this, :defer keeps it lazy)
+(use-package catppuccin-theme
+  :defer t
+  :init (setq catppuccin-flavor 'mocha))
+
+(defun my/load-catppuccin ()
+  "Load catppuccin if available. Safe to call repeatedly."
+  (when (require 'catppuccin-theme nil t)
+    (load-theme 'catppuccin t)))
+
+;; Preserve original deferred behaviour: open without theme, load 0.3s
+;; after window-setup when Emacs is interactive (keeps cold TUI ~0.33s).
+;; Use run-with-timer (not idle) so pgtk/Wayland reliably fires.
 (add-hook 'window-setup-hook
           (lambda ()
-            (run-with-idle-timer 0.3 nil
-             (lambda ()
-               (when (require 'catppuccin-theme nil t)
-                 (setq catppuccin-flavor 'mocha) ; mocha, macchiato, frappe, latte
-                 (load-theme 'catppuccin t))))))
+            (run-with-timer 0.3 nil #'my/load-catppuccin)))
+
+;; daemon / emacsclient on Wayland: window-setup-hook does NOT fire for
+;; frames created after init, so hook server frames explicitly.
+;; Use timers to keep the deferred "load when interactive" behaviour.
+(with-eval-after-load 'server
+  (add-hook 'server-after-make-frame-hook
+            (lambda ()
+              (when (display-graphic-p (selected-frame))
+                (run-with-timer 0.2 nil #'my/load-catppuccin)))))
+(add-hook 'after-make-frame-functions
+          (lambda (frame)
+            (when (display-graphic-p frame)
+              (run-with-timer 0.2 nil
+                              (lambda ()
+                                (when (frame-live-p frame)
+                                  (with-selected-frame frame
+                                    (my/load-catppuccin))))))))
 
 ;; -------------------------------------------------------------------
 ;;; 4. Basic UI
@@ -124,19 +153,21 @@
   :mode ("\\.md\\'" "\\.markdown\\'")
   :hook (markdown-mode . visual-line-mode)
   :custom
+  (markdown-header-scaling t)
+  (markdown-header-scaling-values '(1.4 1.3 1.2 1.1 1.0 1.0))
   (markdown-fontify-code-blocks-natively t)
   (markdown-hide-markup t)
   (markdown-italic-underscore t)
-  (markdown-asymmetric-header t))
+  (markdown-asymmetric-header t)
+  (markdown-enable-wiki-links t))
 
 (use-package obsidian
   :defer t
   :custom
-  (obsidian-directory "~/wiki")
+  (obsidian-directory "~/wiki/vimwiki")
   (obsidian-inbox-directory "Inbox")
   (obsidian-daily-notes-directory "diary")
-  (obsidian-use-update-timer nil) ; no background 'starting obsidian update timer' - use M-x obsidian-update manually
-  (markdown-enable-wiki-links t)
+  (obsidian-use-update-timer nil)
   :config (global-obsidian-mode 1) ; enabled only when you first hit SPC o o (no scan at startup)
   :bind (:map obsidian-mode-map
               ("C-c C-n" . obsidian-capture)
@@ -183,3 +214,17 @@
   :config (global-treesit-auto-mode))
 
 ;;; init.el ends here
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(package-selected-packages
+   '(catppuccin-theme consult evil evil-collection evil-org general
+     markdown-mode obsidian treesit-auto vertico vertico-prescient)))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
