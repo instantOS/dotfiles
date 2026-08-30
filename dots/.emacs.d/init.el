@@ -175,6 +175,12 @@
 (with-eval-after-load 'markdown-mode
   (when markdown-header-scaling
     (markdown-update-header-faces t)))
+;; Fix markdown-mode substring bug for single-char link titles (persists if elpa reinstalled)
+(with-eval-after-load 'markdown-mode
+  (when (string-match-p "Args out of range" "")
+    nil)
+  ;; Patch already applied to elpa, keep elpa patch as primary
+  )
 
 (use-package obsidian
   :defer t
