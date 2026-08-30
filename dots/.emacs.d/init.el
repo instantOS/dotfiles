@@ -94,12 +94,13 @@
 
 ;; Fast vault finder (replaces obsidian-jump for 1800-file vault)
 (defun my/find-vault-file ()
-  "Find file in vault via consult/find-file (fast, no 1700 scan)."
+  "Find file in vault recursively via completing-read + vertico-prescient frecency."
   (interactive)
-  (let ((default-directory (expand-file-name "~/wiki/vimwiki/")))
-    (if (fboundp 'consult-find)
-        (consult-find default-directory)
-      (call-interactively #'find-file))))
+  (let* ((dir (expand-file-name "~/wiki/vimwiki/"))
+         (files (directory-files-recursively dir "\\.md\\'"))
+         (choice (completing-read "Vault: " files nil t)))
+    (when choice
+      (find-file (expand-file-name choice dir)))))
 
 ;; SPC leader via general.el
 (use-package general
@@ -246,7 +247,8 @@
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    '(catppuccin-theme consult evil evil-collection evil-org general
-     markdown-mode obsidian treesit-auto vertico vertico-prescient)))
+		      markdown-mode obsidian treesit-auto vertico
+		      vertico-prescient)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
