@@ -21,3 +21,18 @@ validate:
 # Format and validate in one go
 fmt-validate: fmt
     hyprctl configerrors
+
+dependencies:
+    yay -S --needed \
+        hyprland \
+        hyprpaper \
+        hypridle \
+        hyprlock \
+        hyprutils \
+        waybar \
+        hyprpicker \
+        hyprlang \
+        hyprcursor \
+        nwg-displays \
+        hyprswitch \
+        xdg-desktop-portal-hyprland 
