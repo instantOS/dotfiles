@@ -239,6 +239,19 @@ both modes are global so they affect all frames once enabled."
   :custom (treesit-auto-install 'prompt)
   :config (global-treesit-auto-mode))
 
+;; -------------------------------------------------------------------
+;;; 10. Typst (Tree Sitter)
+;; -------------------------------------------------------------------
+(use-package typst-ts-mode
+  :mode ("\\.typ\\'" . typst-ts-mode)
+  :custom
+  (typst-ts-grammar-location (expand-file-name "tree-sitter/libtree-sitter-typst.so" user-emacs-directory))
+  (typst-ts-enable-raw-blocks-highlight t)
+  (typst-ts-watch-options '("--open"))
+  :config
+  ;; C-c C-c opens the transient menu (compile, watch, preview, etc.)
+  (keymap-set typst-ts-mode-map "C-c C-c" #'typst-ts-tmenu))
+
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -246,8 +259,8 @@ both modes are global so they affect all frames once enabled."
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    '(catppuccin-theme consult evil evil-collection evil-org general
-		      markdown-mode obsidian treesit-auto vertico
-		      vertico-prescient)))
+		      markdown-mode obsidian treesit-auto
+		      typst-ts-mode vertico vertico-prescient)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
