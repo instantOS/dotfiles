@@ -52,7 +52,7 @@ return {
 			date_format = "%Y-%m-%d",
 		},
 		picker = {
-			name = "snacks.pick",
+			name = "snacks.picker",
 		},
 	},
 }

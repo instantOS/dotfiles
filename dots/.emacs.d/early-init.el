@@ -19,9 +19,3 @@
 (push '(internal-border-width . 5) default-frame-alist)
 ;; Maximized without title bar negotiation is faster on Wayland
 (push '(fullscreen . maximized) default-frame-alist)
-
-(push '(menu-bar-lines . 0) initial-frame-alist)
-(push '(tool-bar-lines . 0) initial-frame-alist)
-(push '(vertical-scroll-bars) initial-frame-alist)
-(push '(undecorated . t) initial-frame-alist)
-(push '(undecorated-round . t) initial-frame-alist)
