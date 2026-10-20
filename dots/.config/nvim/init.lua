@@ -1,4 +1,7 @@
 vim.g.mapleader = " "
+-- <LocalLeader> is used by lean.nvim (and other plugins) for buffer-local
+-- mappings. Kept distinct from <leader> so the two do not shadow each other.
+vim.g.maplocalleader = ","
 
 vim.loader.enable()
 
@@ -44,7 +47,12 @@ require("lazy").setup({
 
 vim.api.nvim_create_user_command("Debug", ":lua require'mydap'", { nargs = 0 })
 
-vim.diagnostic.config({ virtual_lines = true })
+-- Lean's elaboration runs while you type, so refresh diagnostics in insert
+-- mode too (see the lean.nvim manual).
+vim.diagnostic.config({ virtual_lines = true, update_in_insert = true })
+
+-- Lean (and other LSP popups) render in floating windows; give them borders.
+vim.opt.winborder = "rounded"
 
 if vim.fn.has("termguicolors") == 1 then
 	vim.opt.termguicolors = true
