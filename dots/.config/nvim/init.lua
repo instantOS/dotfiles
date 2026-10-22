@@ -46,6 +46,12 @@ require("lazy").setup({
 })
 
 vim.api.nvim_create_user_command("Debug", ":lua require'mydap'", { nargs = 0 })
+vim.api.nvim_create_user_command("WikiTags", function()
+	require("mywiki").tags()
+end, { desc = "List wiki tags" })
+vim.api.nvim_create_user_command("WikiTag", function(opts)
+	require("mywiki").tag_references(opts.args)
+end, { nargs = 1, desc = "List references to a wiki tag" })
 
 -- Lean's elaboration runs while you type, so refresh diagnostics in insert
 -- mode too (see the lean.nvim manual).
