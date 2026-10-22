@@ -48,19 +48,13 @@ function M.dailies()
 	now.hour, now.min, now.sec = 12, 0, 0
 	local base = os.time(now)
 
-	-- Today first, then recent days, then upcoming days.
-	local offsets = { 0 }
-	for offset = -1, -14, -1 do
-		offsets[#offsets + 1] = offset
-	end
-	for offset = 1, 14 do
-		offsets[#offsets + 1] = offset
-	end
-
 	local items = {}
-	for _, offset in ipairs(offsets) do
+	for offset = 14, -14, -1 do
 		local ts = base + offset * 86400
 		local date = os.date("%Y-%m-%d", ts)
+		local path = diary_dir() .. "/" .. date .. ".md"
+		local exists = vim.uv.fs_stat(path) ~= nil
+
 		local suffix = ""
 		if offset == 0 then
 			suffix = "  (today)"
@@ -69,19 +63,44 @@ function M.dailies()
 		elseif offset == 1 then
 			suffix = "  (tomorrow)"
 		end
+
 		items[#items + 1] = {
 			text = date .. "  " .. os.date("%a", ts) .. suffix,
-			file = diary_dir() .. "/" .. date .. ".md",
+			file = path,
 			date = date,
+			exists = exists,
+			today = offset == 0,
+			preview = exists and "file" or {
+				text = "This daily note has not been created yet.\n\nPress <CR> to create it.",
+				loc = false,
+			},
 		}
 	end
 
 	require("snacks").picker.pick({
 		title = "Daily notes (±14 days)",
 		items = items,
-		format = "text",
-		preview = "file",
+		format = function(item)
+			return {
+				{
+					item.exists and "✓ " or "○ ",
+					item.exists and "DiagnosticOk" or "Comment",
+					virtual = true,
+				},
+				{ item.text, item.exists and "Normal" or "Comment" },
+			}
+		end,
+		preview = "preview",
 		sort = false,
+		on_show = function(picker)
+			for i, item in ipairs(picker:items()) do
+				if item.today then
+					picker.list:view(i)
+					require("snacks").picker.actions.list_scroll_center(picker)
+					break
+				end
+			end
+		end,
 		confirm = function(picker, item)
 			picker:close()
 			if item then
