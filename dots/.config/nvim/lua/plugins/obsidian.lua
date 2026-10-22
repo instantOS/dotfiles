@@ -54,7 +54,7 @@ return {
 			date_format = "%Y-%m-%d",
 		},
 		picker = {
-			name = "snacks.picker",
+			name = "fzf-lua",
 		},
 	},
 }

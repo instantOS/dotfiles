@@ -141,28 +141,28 @@ return {
 		{
 			"<leader>ts",
 			function()
-				Snacks.picker.lsp_symbols({ layout = { preset = "vscode", preview = "main" } })
+				require("fzf-lua").lsp_document_symbols()
 			end,
 			desc = "LSP Symbols",
 		},
 		{
 			"<leader>tr",
 			function()
-				Snacks.picker.lsp_references({ layout = { preset = "vscode", preview = "main" } })
+				require("fzf-lua").lsp_references()
 			end,
 			desc = "LSP References",
 		},
 		{
 			"<leader>tw",
 			function()
-				Snacks.picker.lsp_workspace_symbols({ layout = { preset = "vscode", preview = "main" } })
+				require("fzf-lua").lsp_workspace_symbols()
 			end,
 			desc = "LSP Workspace Symbols",
 		},
 		{
 			"<leader>to",
 			function()
-				Snacks.picker.recent()
+				require("fzf-lua").oldfiles()
 			end,
 			desc = "Recent files",
 		},
@@ -176,21 +176,21 @@ return {
 		{
 			"<leader><SPACE>",
 			function()
-				Snacks.picker.smart()
+				require("fzf-lua").global()
 			end,
 			desc = "Files",
 		},
 		{
 			"<leader>b",
 			function()
-				Snacks.picker.buffers()
+				require("fzf-lua").buffers()
 			end,
 			desc = "Buffers",
 		},
 		{
 			"<leader>l",
 			function()
-				Snacks.picker.grep()
+				require("fzf-lua").live_grep()
 			end,
 			desc = "Grep",
 		},

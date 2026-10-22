@@ -1,5 +1,5 @@
 -- Wiki helpers replacing the Obsidian keymaps we used before.
--- The wiki is a plain folder of markdown notes, so these only need Snacks.
+-- The wiki is a plain folder of markdown notes; pickers use fzf-lua.
 
 local M = {}
 
@@ -291,27 +291,31 @@ function M.tag_references(tag, index)
 		return a.start < b.start
 	end)
 
-	local items = {}
+	local fzf = require("fzf-lua")
+	local root = wiki_root()
+	local prefix = root .. "/"
+	local entries = {}
 	for _, ref in ipairs(entry.refs) do
-		local positions = {}
-		for col = ref.start, ref.stop do
-			positions[#positions + 1] = col
+		local file = ref.file
+		if file:sub(1, #prefix) == prefix then
+			file = file:sub(#prefix + 1)
 		end
-		items[#items + 1] = {
-			text = ref.text,
-			file = ref.file,
-			pos = { ref.lnum, ref.start - 1 },
-			line = ref.text,
-			positions = positions,
-		}
+		local text = ref.text:gsub("\t", "  "):gsub("\r", "")
+		entries[#entries + 1] = ("%s:%d:%d:%s"):format(file, ref.lnum, ref.start, text)
 	end
 
-	require("snacks").picker.pick({
-		title = ("#%s (%d)"):format(tag, #items),
-		items = items,
-		format = "file",
-		preview = "file",
-		sort = false,
+	fzf.fzf_exec(entries, {
+		cwd = root,
+		prompt = ("#%s> "):format(tag),
+		winopts = { title = (" #%s (%d) "):format(tag, #entries) },
+		previewer = "builtin",
+		fzf_opts = { ["--no-sort"] = true },
+		actions = {
+			["enter"] = fzf.actions.file_edit_or_qf,
+			["ctrl-s"] = fzf.actions.file_split,
+			["ctrl-v"] = fzf.actions.file_vsplit,
+			["ctrl-t"] = fzf.actions.file_tabedit,
+		},
 	})
 end
 
@@ -326,36 +330,36 @@ function M.tags()
 		width = math.max(width, #tag)
 	end
 
-	local items = {}
+	local fzf = require("fzf-lua")
+	local entries = {}
 	for _, tag in ipairs(tags) do
 		local entry = index[tag]
-		items[#items + 1] = {
-			text = "#" .. tag,
-			tag = tag,
-			count = vim.tbl_count(entry.files),
-			pad = width - #tag + 2,
-			index = index,
-		}
+		local count = vim.tbl_count(entry.files)
+		local notes = ("%d note%s"):format(count, count == 1 and "" or "s")
+		entries[#entries + 1] = ("#%s%s%s\t%s"):format(
+			tag,
+			string.rep(" ", width - #tag + 2),
+			fzf.utils.ansi_codes.grey(notes),
+			tag
+		)
 	end
 
-	require("snacks").picker.pick({
-		title = ("Wiki tags (%d)"):format(#items),
-		items = items,
-		format = function(item)
-			return {
-				{ "#" .. item.tag, "Normal" },
-				{ string.rep(" ", item.pad) },
-				{ ("%d note%s"):format(item.count, item.count == 1 and "" or "s"), "SnacksPickerComment" },
-			}
-		end,
-		layout = { preset = "select" },
-		sort = false,
-		confirm = function(picker, item)
-			picker:close()
-			if item then
-				M.tag_references(item.tag, item.index)
-			end
-		end,
+	fzf.fzf_exec(entries, {
+		prompt = "Tags> ",
+		winopts = { title = (" Wiki tags (%d) "):format(#entries) },
+		fzf_opts = {
+			["--delimiter"] = "\t",
+			["--with-nth"] = "1",
+			["--no-sort"] = true,
+		},
+		actions = {
+			["enter"] = function(selected)
+				local tag = selected[1] and selected[1]:match("\t(.+)$")
+				if tag then
+					M.tag_references(tag, index)
+				end
+			end,
+		},
 	})
 end
 
@@ -370,19 +374,26 @@ end
 
 ---Fuzzy-find a note in the wiki.
 function M.quick_switch()
-	require("snacks").picker.files({
+	require("fzf-lua").files({
 		cwd = wiki_root(),
-		ft = "md",
-		title = "Wiki notes",
+		hidden = false,
+		rg_opts = [[--color=never --files -g "*.md" -g "!.git"]],
+		fd_opts = [[--color=never --type f --type l --exclude .git --exclude .jj --extension md]],
+		find_opts = [[-type f -name '*.md' ! -path '*/.git/*' ! -path '*/.jj/*']],
+		prompt = "Wiki notes> ",
+		winopts = { title = " Wiki notes " },
 	})
 end
 
 ---Search the text of all wiki notes.
 function M.search()
-	require("snacks").picker.grep({
+	require("fzf-lua").live_grep({
 		cwd = wiki_root(),
-		glob = "*.md",
-		title = "Search wiki",
+		hidden = false,
+		rg_opts = [[--column --line-number --no-heading --color=always --smart-case --max-columns=4096 -g "*.md" -e]],
+		grep_opts = [[--perl-regexp --binary-files=without-match --line-number --recursive --color=always --include="*.md" -e]],
+		prompt = "Search wiki> ",
+		winopts = { title = " Search wiki " },
 	})
 end
 
@@ -392,7 +403,9 @@ function M.dailies()
 	now.hour, now.min, now.sec = 12, 0, 0
 	local base = os.time(now)
 
-	local items = {}
+	local fzf = require("fzf-lua")
+	local entries = {}
+	local today_index = 1
 	for offset = 14, -14, -1 do
 		local ts = base + offset * 86400
 		local date = os.date("%Y-%m-%d", ts)
@@ -402,55 +415,60 @@ function M.dailies()
 		local suffix = ""
 		if offset == 0 then
 			suffix = "  (today)"
+			today_index = #entries + 1
 		elseif offset == -1 then
 			suffix = "  (yesterday)"
 		elseif offset == 1 then
 			suffix = "  (tomorrow)"
 		end
 
-		items[#items + 1] = {
-			text = date .. "  " .. os.date("%a", ts) .. suffix,
-			file = path,
-			date = date,
-			exists = exists,
-			today = offset == 0,
-			preview = exists and "file" or {
-				text = "This daily note has not been created yet.\n\nPress <CR> to create it.",
-				loc = false,
-			},
-		}
+		local marker = exists and fzf.utils.ansi_from_hl("DiagnosticOk", "✓") or fzf.utils.ansi_codes.grey("○")
+		local text = date .. "  " .. os.date("%a", ts) .. suffix
+		entries[#entries + 1] = marker .. " " .. text .. "\t" .. date
 	end
 
-	require("snacks").picker.pick({
-		title = "Daily notes (±14 days)",
-		items = items,
-		format = function(item)
-			return {
-				{
-					item.exists and "✓ " or "○ ",
-					item.exists and "DiagnosticOk" or "Comment",
-					virtual = true,
-				},
-				{ item.text, item.exists and "Normal" or "Comment" },
-			}
-		end,
-		preview = "preview",
-		sort = false,
-		on_show = function(picker)
-			for i, item in ipairs(picker:items()) do
-				if item.today then
-					picker.list:view(i)
-					require("snacks").picker.actions.list_scroll_center(picker)
-					break
+	fzf.fzf_exec(entries, {
+		prompt = "Daily> ",
+		winopts = { title = " Daily notes (±14 days) " },
+		fzf_opts = {
+			["--delimiter"] = "\t",
+			["--with-nth"] = "1",
+			["--no-sort"] = true,
+			["--scroll-off"] = 10,
+			["--sync"] = true,
+		},
+		keymap = { fzf = { start = ("pos(%d)"):format(today_index) } },
+		previewer = {
+			_ctor = function()
+				local previewer = require("fzf-lua.previewer.builtin").buffer_or_file:extend()
+				function previewer:parse_entry(entry_str)
+					local date = entry_str:match("\t(%d%d%d%d%-%d%d%-%d%d)$")
+					if not date then
+						return { content = { { { "No preview available.", "Error" } } } }
+					end
+					local path = diary_dir() .. "/" .. date .. ".md"
+					if vim.uv.fs_stat(path) then
+						return self:entry_to_file(path)
+					end
+					return {
+						content = {
+							{ { "This daily note has not been created yet.", "Comment" } },
+							"",
+							{ { "Press <CR> to create it.", "Comment" } },
+						},
+					}
 				end
-			end
-		end,
-		confirm = function(picker, item)
-			picker:close()
-			if item then
-				M.open_daily(item.date)
-			end
-		end,
+				return previewer
+			end,
+		},
+		actions = {
+			["enter"] = function(selected)
+				local date = selected[1] and selected[1]:match("\t(%d%d%d%d%-%d%d%-%d%d)$")
+				if date then
+					M.open_daily(date)
+				end
+			end,
+		},
 	})
 end
 
