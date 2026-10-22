@@ -48,11 +48,15 @@ return {
 			nerd_font_variant = "mono",
 		},
 		sources = {
-			default = { "lazydev", "lsp", "path", "snippets", "buffer" },
+			default = { "lazydev", "lsp", "path", "snippets", "buffer", "mkdnflow" },
 			per_filetype = {
 				codecompanion = { "codecompanion" },
 			},
 			providers = {
+				mkdnflow = {
+					name = "Mkdnflow",
+					module = "mkdnflow.completion.blink",
+				},
 				lsp = {
 					name = "LSP",
 					module = "blink.cmp.sources.lsp",

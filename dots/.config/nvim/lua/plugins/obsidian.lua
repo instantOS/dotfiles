@@ -3,7 +3,9 @@ return {
 	version = "*", -- recommended, use latest release instead of latest commit
 	lazy = true,
 	-- ft = "markdown",
-	-- enabled = false,
+	-- Disabled in favour of mkdnflow.nvim (see lua/plugins/mkdnflow.lua).
+	-- The config is kept so this can be re-enabled by flipping the value.
+	enabled = false,
 	cmd = { "Obsidian" },
 	keys = {
 		{
