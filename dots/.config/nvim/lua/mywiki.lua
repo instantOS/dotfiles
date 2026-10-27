@@ -377,6 +377,12 @@ function M.quick_switch()
 	require("fzf-lua").files({
 		cwd = wiki_root(),
 		hidden = false,
+		-- Keep the preview visible while typing, but skip treesitter syntax
+		-- highlighting (the expensive part). File contents are still shown as
+		-- plain text, so typing never freezes even on huge/long-line notes.
+		-- (Must be passed via `previewer`, since top-level `syntax` is not
+		-- merged into the previewer opts.)
+		previewer = { syntax = false },
 		rg_opts = [[--color=never --files -g "*.md" -g "!.git"]],
 		fd_opts = [[--color=never --type f --type l --exclude .git --exclude .jj --extension md]],
 		find_opts = [[-type f -name '*.md' ! -path '*/.git/*' ! -path '*/.jj/*']],
