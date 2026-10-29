@@ -63,6 +63,9 @@ alias open="xdg-open"
 alias v=nvim
 alias vv="nvim ."
 
+alias hr="herdr"
+alias oc="opencode2"
+
 # yazi wrapper which keeps cwd
 function y() {
 	local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
