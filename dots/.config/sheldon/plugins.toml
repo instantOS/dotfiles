@@ -11,11 +11,15 @@ apply = ["fpath"]
 [plugins.compinit]
 inline = """
 autoload -Uz compinit
-if [[ -n "${ZDOTDIR:-$HOME}/.zcompdump(#qN.m+1)" ]]; then
+# Check the dump once per day; glob qualifiers need filename generation.
+local -a _zcomp_old
+_zcomp_old=( "${ZDOTDIR:-$HOME}/.zcompdump"(N.mh+24) )
+if [[ ! -s "${ZDOTDIR:-$HOME}/.zcompdump" ]] || (( $#_zcomp_old )); then
   compinit
 else
   compinit -C
 fi
+unset _zcomp_old
 """
 
 # 3. Configure standard completion styling and behaviors
@@ -54,7 +58,7 @@ use = ["theme-and-appearance.zsh"]
 
 # 5. Load external tools and integrations
 [plugins.zoxide]
-inline = 'eval "$(zoxide init zsh)"'
+inline = '_zsh_cached_init zoxide zoxide init zsh'
 
 # (Pin: 677a459)
 [plugins.ohmyzsh-fzf]

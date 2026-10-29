@@ -4,7 +4,9 @@ export SSH_AUTH_SOCK=$XDG_RUNTIME_DIR/ssh-agent.socket
 
 export PATH="$HOME/.cargo/bin:$HOME/.local/bin:$HOME/node_modules/.bin:$PATH"
 
-eval "$(mise activate zsh)"
+# Tool shims make managed commands available before mise activation.
+path=("$HOME/.local/share/mise/shims" $path)
+typeset -U path
 
 zstyle ':fzf-tab:*' use-fzf-default-opts yes
 export FZF_DEFAULT_OPTS=" \
@@ -15,6 +17,47 @@ export FZF_DEFAULT_OPTS=" \
 --multi"
 
 bindkey -e
+
+# Cache reusable init code; mise activation itself remains dynamic.
+_zsh_cached_init() {
+  local name=$1 executable=$commands[$2]
+  shift
+  [[ -n $executable ]] || return 127
+  # A shim's timestamp describes mise, not the selected tool installation.
+  if [[ $executable == "$HOME/.local/share/mise/shims/"* ]]; then
+    executable=$(command mise which "$1") || return
+  fi
+  executable=${executable:A}
+  local cache_dir=${XDG_CACHE_HOME:-$HOME/.cache}/zsh/init
+  local cache=$cache_dir/$name.zsh
+  local tool_config=${XDG_CONFIG_HOME:-$HOME/.config}/$name/config.toml
+  local fingerprint="${(qqq)@}:$executable" file previous
+  local -A info
+  zmodload zsh/stat
+  for file in "$executable" "${ZDOTDIR:-$HOME}/.zshrc" "$tool_config"; do
+    info=()
+    if zstat -H info -- "$file" 2>/dev/null; then
+      fingerprint+="|$file:$info[device]:$info[inode]:$info[size]:$info[mtime]:$info[ctime]"
+    else
+      fingerprint+="|$file:missing"
+    fi
+  done
+  [[ -r $cache.key ]] && previous=$(<"$cache.key")
+  if [[ ! -s $cache || $previous != $fingerprint ]]; then
+    command mkdir -p "$cache_dir" || return
+    local tmp=$cache.$$.tmp
+    if "$executable" "${@:2}" >| "$tmp" && [[ -s $tmp ]]; then
+      [[ ! -f $cache.zwc ]] || command unlink "$cache.zwc"
+      command mv -f "$tmp" "$cache" || return
+      print -r -- "$fingerprint" >| "$tmp.key"
+      command mv -f "$tmp.key" "$cache.key"
+    else
+      [[ ! -f $tmp ]] || command unlink "$tmp"
+      return 1
+    fi
+  fi
+  source "$cache"
+}
 
 # Sheldon plugin manager setup (compiled single-file cache)
 if [[ ! -s "$HOME/.config/sheldon/source.zsh" \
@@ -39,17 +82,14 @@ if [[ ! -s "$HOME/.config/sheldon/source.zsh" \
       echo "$line" >> "$tmp_cache"
     fi
   done
-  # Statically cache starship prompt setup
-  if command -v starship &>/dev/null; then
-    starship init zsh >> "$tmp_cache"
-    echo "" >> "$tmp_cache"
-  fi
   mv "$tmp_cache" "$HOME/.config/sheldon/source.zsh"
   zcompile "$HOME/.config/sheldon/source.zsh"
 fi
 source "$HOME/.config/sheldon/source.zsh"
+_zsh_cached_init starship starship init zsh
 
-source <(COMPLETE=zsh ins)
+
+COMPLETE=zsh _zsh_cached_init ins ins
 
 export ANSIBLE_VAULT_PASSWORD_FILE=/tmp/ansible-vault-pass."$USER"
 
@@ -95,3 +135,8 @@ command_not_found_handler() {
     fi
 }
 
+
+_zsh_cached_init atuin atuin init zsh
+
+# Activate last: compdef exists, and PATH is final before mise captures it.
+eval "$(mise activate zsh)"
