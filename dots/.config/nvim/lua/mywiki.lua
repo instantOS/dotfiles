@@ -261,9 +261,31 @@ function M.tag_at_cursor()
 	local row, col = unpack(vim.api.nvim_win_get_cursor(0))
 	col = col + 1
 	local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
-	local file = vim.api.nvim_buf_get_name(0)
-	for _, tag in ipairs(lines_tags(lines, file)) do
-		if tag.lnum == row and col >= tag.start and col <= tag.stop then
+	local fm_end = frontmatter_end(lines)
+
+	if row <= fm_end then
+		for _, tag in ipairs(frontmatter_tags(lines, fm_end)) do
+			if tag.lnum == row and col >= tag.start and col <= tag.stop then
+				return tag.tag
+			end
+		end
+		return
+	end
+
+	-- Only the current line is parsed; find whether it is inside a fence
+	-- without running the full tag extraction over the whole buffer.
+	local in_fence = false
+	for i = fm_end + 1, row - 1 do
+		if is_fence(lines[i]) then
+			in_fence = not in_fence
+		end
+	end
+	if in_fence or is_fence(lines[row]) then
+		return
+	end
+
+	for _, tag in ipairs(inline_tags(blank_inline_code(lines[row]))) do
+		if col >= tag.start and col <= tag.stop then
 			return tag.tag
 		end
 	end
@@ -361,6 +383,307 @@ function M.tags()
 			end,
 		},
 	})
+end
+
+-- Link handling ------------------------------------------------------------
+
+local URL_PATTERN = "[Hh][Tt][Tt][Pp][Ss]?://"
+local FILE_URL_PATTERN = "[Ff][Ii][Ll][Ee]://"
+local URL_STOP_CHARS = {
+	["<"] = true,
+	[">"] = true,
+	['"'] = true,
+	["'"] = true,
+	["`"] = true,
+	["|"] = true,
+	["]"] = true,
+	["}"] = true,
+}
+
+local function is_supported_url(url)
+	return url:match("^" .. URL_PATTERN) ~= nil or url:match("^" .. FILE_URL_PATTERN) ~= nil
+end
+
+---Remove link decorations and sentence punctuation from a URL.
+local function clean_url(url)
+	url = vim.trim(url)
+	url = url:gsub("^<", ""):gsub(">$", "")
+	return (url:gsub("[%.,;:!?]+$", ""))
+end
+
+local function percent_decode(text)
+	return (text:gsub("%%(%x%x)", function(hex)
+		return string.char(tonumber(hex, 16))
+	end))
+end
+
+local function is_link_node(node)
+	local kind = node:type()
+	return kind == "inline_link"
+		or kind == "image"
+		or kind == "shortcut_link"
+		or kind == "full_reference_link"
+		or kind == "collapsed_reference_link"
+end
+
+---Find a link at the cursor with treesitter. This handles cursor positions on
+---the link text as well as on its destination. The boolean return value says
+---whether the cursor is inside a link at all, so that an unsupported link
+---destination (for example a regular wiki note link) is left to Mkdnflow.
+local function treesitter_link_at_cursor(row, col)
+	local ok, node = pcall(vim.treesitter.get_node, {
+		bufnr = 0,
+		pos = { row - 1, col },
+		ignore_injections = false,
+	})
+	if not ok or not node then
+		return nil, false, false
+	end
+
+	-- Do not turn URLs in code spans/blocks or YAML frontmatter into links.
+	local code_types = {
+		code_span = true,
+		fenced_code_block = true,
+		indented_code_block = true,
+		code_fence_content = true,
+		minus_metadata = true,
+		plus_metadata = true,
+	}
+	local in_code = false
+	local parent = node
+	while parent do
+		if code_types[parent:type()] then
+			in_code = true
+			break
+		end
+		parent = parent:parent()
+	end
+
+	local kind = node:type()
+	if kind == "link_destination" or kind == "uri_autolink" then
+		return clean_url(vim.treesitter.get_node_text(node, 0)), true, in_code
+	end
+
+	parent = node
+	while parent do
+		if is_link_node(parent) then
+			-- Inline links and images have the destination as a direct child.
+			for child in parent:iter_children() do
+				if child:type() == "link_destination" then
+					return clean_url(vim.treesitter.get_node_text(child, 0)), true, in_code
+				end
+			end
+
+			-- Vimwiki links are parsed as shortcut links: [[url|title]]. The
+			-- parser often gives us only the inner [url|title] part.
+			if parent:type() == "shortcut_link" then
+				local raw = vim.treesitter.get_node_text(parent, 0)
+				local inner = raw:match("^%[%[(.*)%]%]$") or raw:match("^%[(.*)%]$")
+				if inner then
+					local url = clean_url(inner:match("^([^|]+)") or inner)
+					if is_supported_url(url) then
+						return url, true, in_code
+					end
+				end
+			end
+			return nil, true, in_code
+		end
+		if parent:type() == "inline" or parent:type() == "section" or parent:type() == "document" then
+			break
+		end
+		parent = parent:parent()
+	end
+	return nil, false, in_code
+end
+
+local function next_url_start(line, init)
+	local http = line:find(URL_PATTERN, init)
+	local file = line:find(FILE_URL_PATTERN, init)
+	if http and file then
+		return math.min(http, file)
+	end
+	return http or file
+end
+
+---Find a bare URL under the cursor. `col` is a 1-based byte column.
+local function bare_url_at_cursor(line, col)
+	local init = 1
+	while true do
+		local start = next_url_start(line, init)
+		if not start then
+			return nil
+		end
+
+		local i = start
+		local depth = 0
+		while i <= #line do
+			local char = line:sub(i, i)
+			if char:match("%s") then
+				break
+			elseif char == "(" then
+				depth = depth + 1
+			elseif char == ")" then
+				if depth == 0 then
+					break
+				end
+				depth = depth - 1
+			elseif URL_STOP_CHARS[char] then
+				break
+			end
+			i = i + 1
+		end
+
+		local url = clean_url(line:sub(start, i - 1))
+		if url ~= "" and col >= start and col <= start + #url - 1 then
+			return url
+		end
+		init = start + 1
+	end
+end
+
+---Return the supported URL under the cursor, if any.
+---@return string|nil
+function M.url_at_cursor()
+	local row, col = unpack(vim.api.nvim_win_get_cursor(0))
+	local line = vim.api.nvim_get_current_line()
+
+	-- Cheap path for the overwhelmingly common case: Enter on a line without
+	-- any supported URL never needs a treesitter lookup or buffer scan.
+	if not line:find(URL_PATTERN, 1) and not line:find(FILE_URL_PATTERN, 1) then
+		return nil
+	end
+
+	local ok, ts_url, ts_in_link, ts_in_code = pcall(treesitter_link_at_cursor, row, col)
+	if ok and ts_in_code then
+		return nil
+	end
+	if ok then
+		if ts_url and is_supported_url(ts_url) then
+			return ts_url
+		end
+		if ts_in_link then
+			-- The cursor is on a real link, but not a URL link. Let Mkdnflow
+			-- follow it instead of mistaking URL text inside the link for one.
+			return nil
+		end
+	end
+
+	local url = bare_url_at_cursor(line, col + 1)
+	if url and is_supported_url(url) then
+		return url
+	end
+end
+
+---Parse a file:// URL. Returns the local path and an optional fragment.
+local function file_url_target(url)
+	local rest = url:match("^" .. FILE_URL_PATTERN .. "(.*)$")
+	if not rest then
+		return nil, "not a file URL"
+	end
+
+	local fragment
+	local hash = rest:find("#", 1, true)
+	if hash then
+		fragment = rest:sub(hash + 1)
+		rest = rest:sub(1, hash - 1)
+	end
+	local query = rest:find("?", 1, true)
+	if query then
+		rest = rest:sub(1, query - 1)
+	end
+
+	-- file:///path has an empty authority; file://localhost/path is local too.
+	if rest:sub(1, 1) ~= "/" then
+		local authority, path = rest:match("^([^/]*)(/.*)$")
+		if not authority then
+			return nil, "invalid file URL"
+		end
+		if authority ~= "" and authority:lower() ~= "localhost" then
+			return nil, "remote file URLs are not supported"
+		end
+		rest = path
+	end
+
+	local path = percent_decode(rest)
+	if path == "" then
+		return nil, "empty file URL path"
+	end
+	if path:sub(1, 1) ~= "/" then
+		local current = vim.api.nvim_buf_get_name(0)
+		local base = current ~= "" and vim.fs.dirname(current) or vim.fn.getcwd()
+		path = vim.fs.joinpath(base, path)
+	end
+	return vim.fs.normalize(path), fragment
+end
+
+---Get the line number from fragments such as #L47, #L47-L170 or #line=47.
+local function fragment_line(fragment)
+	if not fragment or fragment == "" then
+		return nil
+	end
+	fragment = percent_decode(fragment)
+	local start = fragment:match("^[Ll](%d+)") or fragment:match("^[Ll][Ii][Nn][Ee]=(%d+)") or fragment:match("^(%d+)")
+	return start and tonumber(start) or nil
+end
+
+---Open a file:// URL in the current window, honoring #Lnn line anchors.
+function M.open_file_url(url)
+	local path, fragment = file_url_target(url)
+	if not path then
+		vim.notify("Wiki: " .. (fragment or "invalid file URL"), vim.log.levels.ERROR)
+		return
+	end
+
+	local stat = vim.uv.fs_stat(path)
+	if not stat then
+		vim.notify("Wiki: file not found: " .. path, vim.log.levels.ERROR)
+		return
+	end
+	if stat.type == "directory" then
+		vim.notify("Wiki: not a file: " .. path, vim.log.levels.ERROR)
+		return
+	end
+
+	local current = vim.api.nvim_buf_get_name(0)
+	if current == "" or vim.fs.normalize(current) ~= path then
+		vim.cmd.edit(vim.fn.fnameescape(path))
+	end
+
+	local line = fragment_line(fragment)
+	if line then
+		line = math.max(1, math.min(line, vim.api.nvim_buf_line_count(0)))
+		vim.api.nvim_win_set_cursor(0, { line, 0 })
+		vim.cmd("normal! zz")
+	end
+end
+
+---Open a supported URL. http(s) URLs go to the system handler; file:// URLs
+---are opened as buffers so their line anchors work.
+---@param url string
+function M.open_url(url)
+	if url:match("^" .. FILE_URL_PATTERN) then
+		M.open_file_url(url)
+		return
+	end
+
+	local ok, result, err = pcall(vim.ui.open, url)
+	if not ok then
+		vim.notify("Wiki: could not open link: " .. tostring(result), vim.log.levels.ERROR)
+	elseif err then
+		vim.notify("Wiki: could not open link: " .. err, vim.log.levels.ERROR)
+	end
+end
+
+---Open the URL under the cursor. Returns true when a link was handled, so the
+---Enter mapping can leave normal Enter behavior untouched otherwise.
+---@return boolean
+function M.open_url_at_cursor()
+	local url = M.url_at_cursor()
+	if not url then
+		return false
+	end
+	M.open_url(url)
+	return true
 end
 
 ---Open (and create, if needed) the daily note for a date.

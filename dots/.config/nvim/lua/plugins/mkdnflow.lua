@@ -75,6 +75,9 @@ return {
 				local links = require("mkdnflow").links
 				local wiki = require("mywiki")
 				vim.keymap.set("n", "<CR>", function()
+					if wiki.open_url_at_cursor() then
+						return
+					end
 					local tag = wiki.tag_at_cursor()
 					if tag then
 						wiki.tag_references(tag)
@@ -83,7 +86,7 @@ return {
 					else
 						vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<CR>", true, false, true), "n", false)
 					end
-				end, { buffer = bufnr, desc = "Follow tag/link (or default <CR>)" })
+				end, { buffer = bufnr, desc = "Follow URL/tag/link (or default <CR>)" })
 			end,
 			mappings = {
 				-- <leader>f saves and <leader>F formats; folds are disabled above.
