@@ -104,6 +104,7 @@ alias v=nvim
 alias vv="nvim ."
 
 alias hr="herdr"
+alias hrr='herdr --remote'
 alias oc="opencode2"
 
 # yazi wrapper which keeps cwd
