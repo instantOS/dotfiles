@@ -1,21 +1,13 @@
 return {
-	-- "neovim/nvim-lspconfig",
-	"mason-org/mason-lspconfig.nvim",
-	dependencies = {
-		{ "mason-org/mason.nvim" },
-		"neovim/nvim-lspconfig",
-	},
+	"neovim/nvim-lspconfig",
 	event = { "VeryLazy", "BufReadPost", "BufWritePost", "BufNewFile" },
 	config = function()
-		-- local potato = require("mypotato")
 		if vim.fn.has("nvim-0.12") == 1 then
 			vim.lsp.inline_completion.enable(true)
 		end
-		require("mason").setup()
-		local capabilities = require("blink.cmp").get_lsp_capabilities()
 
 		vim.lsp.config("*", {
-			capabilities = capabilities,
+			capabilities = require("blink.cmp").get_lsp_capabilities(),
 		})
 
 		vim.lsp.config("tinymist", {
@@ -25,7 +17,6 @@ return {
 		})
 
 		vim.lsp.config["yamlls"] = {
-			capabilities = capabilities,
 			settings = {
 				yaml = {
 					schemas = {
@@ -35,13 +26,12 @@ return {
 			},
 		}
 
-		require("mason-lspconfig").setup({
-			automatic_enable = {
-				exclude = {
-					"harper_ls",
-					"lua_ls",
-				},
-			},
+		vim.lsp.enable({
+			"ty", -- Python type checking/completion (mise)
+			"ruff", -- Python lint/format (mise)
+			"tinymist", -- Typst (mise)
+			"rust_analyzer", -- Rust (mise)
+			"clangd", -- C/C++ (system)
 		})
 	end,
 }
