@@ -52,6 +52,7 @@ end, { desc = "List wiki tags" })
 vim.api.nvim_create_user_command("WikiTag", function(opts)
 	require("mywiki").tag_references(opts.args)
 end, { nargs = 1, desc = "List references to a wiki tag" })
+require("mycalendar").setup()
 
 -- Lean's elaboration runs while you type, so refresh diagnostics in insert
 -- mode too (see the lean.nvim manual).
@@ -82,8 +83,6 @@ vim.cmd([[
 
 set guifont=FiraCode\ Nerd\ Font\ Mono:h11
 set encoding=UTF-8
-
-command! Cal Calendar | vertical resize +20
 
 nnoremap <leader>vn :cnext<CR>
 nnoremap <leader>vp :cprevious<CR>

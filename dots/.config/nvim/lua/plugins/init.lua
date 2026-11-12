@@ -21,7 +21,6 @@ return {
 		config = true,
 		enabled = not potato,
 	},
-	{ "paperbenni/Calendar.vim", cmd = { "Calendar", "CalendarH", "CalendarT" } },
 	-- { "michal-h21/vim-zettel",   event = "BufRead *.md" },
 
 	{
