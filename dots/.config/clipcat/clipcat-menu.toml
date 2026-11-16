@@ -25,13 +25,13 @@ program = "/usr/bin/instantmenu"
 args = [
     "-p",
     "    ",
-    "-q",
+    "--placeholder",
     "clipboard manager",
-    "-h",
+    "--line-height",
     "-1",
     "-l",
     "4",
-    "-lc",
+    "--left-command",
     "instantclipmenu delete"
 ]
 

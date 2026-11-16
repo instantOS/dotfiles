@@ -692,7 +692,27 @@ function M.open_daily(date)
 	date = date or os.date("%Y-%m-%d")
 	local dir = diary_dir()
 	vim.fn.mkdir(dir, "p")
-	vim.cmd.edit(vim.fn.fnameescape(dir .. "/" .. date .. ".md"))
+	vim.cmd.edit(vim.fn.fnameescape(M.daily_path(date)))
+end
+
+---Shared by the daily picker and calendar; respects g:mywiki_root.
+function M.daily_path(date)
+	return diary_dir() .. "/" .. date .. ".md"
+end
+
+function M.daily_dates()
+	local dates = {}
+	if vim.fn.isdirectory(diary_dir()) == 0 then
+		return dates
+	end
+	for name, kind in vim.fs.dir(diary_dir()) do
+		local date = name:match("^(%d%d%d%d%-%d%d%-%d%d)%.md$")
+		if date and (kind == "file" or kind == "link") then
+			dates[#dates + 1] = date
+		end
+	end
+	table.sort(dates)
+	return dates
 end
 
 ---Fuzzy-find a note in the wiki.
@@ -730,15 +750,14 @@ end
 function M.dailies()
 	local now = os.date("*t")
 	now.hour, now.min, now.sec = 12, 0, 0
-	local base = os.time(now)
 
 	local fzf = require("fzf-lua")
 	local entries = {}
 	local today_index = 1
 	for offset = 14, -14, -1 do
-		local ts = base + offset * 86400
+		local ts = os.time({ year = now.year, month = now.month, day = now.day + offset, hour = 12 })
 		local date = os.date("%Y-%m-%d", ts)
-		local path = diary_dir() .. "/" .. date .. ".md"
+		local path = M.daily_path(date)
 		local exists = vim.uv.fs_stat(path) ~= nil
 
 		local suffix = ""
@@ -758,7 +777,7 @@ function M.dailies()
 
 	fzf.fzf_exec(entries, {
 		prompt = "Daily> ",
-		winopts = { title = " Daily notes (±14 days) " },
+		winopts = { title = " Daily notes (±14 days) · ctrl-g calendar " },
 		fzf_opts = {
 			["--delimiter"] = "\t",
 			["--with-nth"] = "1",
@@ -775,7 +794,7 @@ function M.dailies()
 					if not date then
 						return { content = { { { "No preview available.", "Error" } } } }
 					end
-					local path = diary_dir() .. "/" .. date .. ".md"
+					local path = M.daily_path(date)
 					if vim.uv.fs_stat(path) then
 						return self:entry_to_file(path)
 					end
@@ -791,6 +810,10 @@ function M.dailies()
 			end,
 		},
 		actions = {
+			["ctrl-g"] = function(selected)
+				local date = selected[1] and selected[1]:match("\t(%d%d%d%d%-%d%d%-%d%d)$")
+				require("mycalendar").open(date)
+			end,
 			["enter"] = function(selected)
 				local date = selected[1] and selected[1]:match("\t(%d%d%d%d%-%d%d%-%d%d)$")
 				if date then

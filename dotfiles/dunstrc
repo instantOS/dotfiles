@@ -23,7 +23,7 @@
     show_indicators = yes
     markup = full
     font = Inter 12
-    dmenu = /usr/bin/instantmenu -q "notification menu" -l 10 -w -1 -x 1000000 -bw 5 -y 32
+    dmenu = /usr/bin/instantmenu --placeholder "notification menu" -l 10 -w -1 --position top-right --border-width 5 -y 32
     progress_bar_max_width = 500
     progress_bar_frame_width = 2
     highlight = "#88B2F6"
