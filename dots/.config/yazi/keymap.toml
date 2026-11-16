@@ -1,0 +1,10 @@
+
+[[mgr.prepend_keymap]]
+on = ["F"]
+run = "search --via=rga"
+desc = "Search file content"
+
+[[mgr.prepend_keymap]]
+on   = "<C-o>"
+run  = "shell --block -- ins open %h"
+desc = "Open hovered file with ins"
