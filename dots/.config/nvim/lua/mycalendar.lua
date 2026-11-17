@@ -38,8 +38,8 @@ local function move_month(ts, months)
 end
 
 local function geometry()
-	local width = math.min(88, vim.o.columns - 4)
-	local height = math.min(32, vim.o.lines - vim.o.cmdheight - 4)
+	local width = math.min(120, vim.o.columns - 4)
+	local height = math.min(40, vim.o.lines - vim.o.cmdheight - 4)
 	return {
 		relative = "editor",
 		width = width,
@@ -103,6 +103,32 @@ local function preview(date, limit)
 	return ok and lines or { "No note yet. Press Enter to start this day." }
 end
 
+local function preview_rows(date, height, width)
+	local rows = {}
+	for _, line in ipairs(preview(date, height)) do
+		line = line:gsub("\t", "  "):gsub("%c", " ")
+		if vim.fn.strdisplaywidth(line) > width then
+			local chunk = ""
+			for _, char in ipairs(vim.fn.split(line, [[\zs]])) do
+				if vim.fn.strdisplaywidth(chunk .. char) > width then
+					rows[#rows + 1] = chunk
+					if #rows == height then
+						return rows
+					end
+					chunk = ""
+				end
+				chunk = chunk .. char
+			end
+			line = chunk
+		end
+		rows[#rows + 1] = line
+		if #rows == height then
+			break
+		end
+	end
+	return rows
+end
+
 local function render(s)
 	if active ~= s or not api.nvim_win_is_valid(s.win) then
 		return
@@ -112,10 +138,10 @@ local function render(s)
 	local offset = (first.wday + 5) % 7 -- Monday first.
 	local days = os.date("*t", stamp(d.year, d.month + 1, 0)).day
 	local date = date_of(s.selected)
+	local width = api.nvim_win_get_width(s.win)
 	local function separator(label)
 		local prefix = "  ── " .. label .. " "
-		return prefix
-			.. string.rep("─", math.max(0, api.nvim_win_get_width(s.win) - vim.fn.strdisplaywidth(prefix) - 2))
+		return prefix .. string.rep("─", math.max(0, width - vim.fn.strdisplaywidth(prefix) - 2))
 	end
 	local lines = { "  " .. os.date("%B %Y", s.selected), "", "  Mo   Tu   We   Th   Fr   Sa   Su" }
 	local marks = {}
@@ -136,7 +162,7 @@ local function render(s)
 					hl = "MyCalendarSelected"
 					selected_row, selected_col = #lines + 1, col
 				end
-				marks[#marks + 1] = { #lines, col, hl }
+				marks[#marks + 1] = { #lines, col, col + 3, hl }
 			end
 			cells[#cells + 1] = cell
 		end
@@ -146,38 +172,62 @@ local function render(s)
 		"",
 		"  " .. date .. " · " .. os.date("%A", s.selected) .. (s.notes[date] and " · note" or " · new"),
 		"  * diary note    Today: " .. os.date("%Y-%m-%d"),
-		separator("Note preview"),
 	})
-	local preview_height = math.max(0, api.nvim_win_get_height(s.win) - 18)
-	for i, line in ipairs(preview(date, preview_height)) do
-		if i > preview_height then
-			break
-		end
-		lines[#lines + 1] = "  " .. line:gsub("\t", "  "):gsub("%c", " ")
-	end
-	while #lines < 13 + preview_height do
-		lines[#lines + 1] = ""
-	end
-	local footer_start = #lines
-	vim.list_extend(lines, {
+	local footer = {
 		separator("Controls"),
 		"  hjkl/arrows: day/week   [ ]: month   { }: year",
 		"  t: today   g: date   p/n: previous/next note",
 		"  Enter: open   D: daily picker   q/Esc: close",
 		"  Ctrl-s/v/t: open in split / vertical / tab",
-	})
+	}
+	local body_height = api.nvim_win_get_height(s.win) - #footer
+	local calendar_title_end = #lines[1]
+	local left_width = 38
+	for _, line in ipairs(lines) do
+		left_width = math.max(left_width, vim.fn.strdisplaywidth(line) + 2)
+	end
+	local preview_heading_col
+	if width - left_width >= 38 then
+		local divider = "│  "
+		local right = { "Note preview", "" }
+		vim.list_extend(right, preview_rows(date, body_height - #right, width - left_width - 5))
+		for row = 1, body_height do
+			local left = lines[row] or ""
+			left = left .. string.rep(" ", left_width - vim.fn.strdisplaywidth(left))
+			lines[row] = left .. divider .. (right[row] or "")
+			marks[#marks + 1] = { row - 1, #left, #left + #"│", "Comment" }
+			if row == 1 then
+				preview_heading_col = #left + #divider
+			end
+		end
+	else
+		lines[#lines + 1] = separator("Note preview")
+		local preview_height = math.max(0, body_height - #lines)
+		for _, line in ipairs(preview_rows(date, preview_height, width - 4)) do
+			lines[#lines + 1] = "  " .. line
+		end
+		while #lines < body_height do
+			lines[#lines + 1] = ""
+		end
+	end
+	local footer_start = #lines
+	vim.list_extend(lines, footer)
 	vim.bo[s.buf].modifiable = true
 	api.nvim_buf_set_lines(s.buf, 0, -1, false, lines)
 	vim.bo[s.buf].modifiable = false
 	api.nvim_buf_clear_namespace(s.buf, ns, 0, -1)
 	for _, mark in ipairs(marks) do
 		api.nvim_buf_set_extmark(s.buf, ns, mark[1], mark[2], {
-			end_col = mark[2] + 3,
-			hl_group = mark[3],
+			end_col = mark[3],
+			hl_group = mark[4],
 		})
 	end
-	api.nvim_buf_set_extmark(s.buf, ns, 0, 2, { end_col = #lines[1], hl_group = "Title" })
-	api.nvim_buf_set_extmark(s.buf, ns, 12, 0, { end_col = #lines[13], hl_group = "Comment" })
+	api.nvim_buf_set_extmark(s.buf, ns, 0, 2, { end_col = calendar_title_end, hl_group = "Title" })
+	if preview_heading_col then
+		api.nvim_buf_set_extmark(s.buf, ns, 0, preview_heading_col, { end_col = #lines[1], hl_group = "Title" })
+	else
+		api.nvim_buf_set_extmark(s.buf, ns, 12, 0, { end_col = #lines[13], hl_group = "Comment" })
+	end
 	for row = footer_start, #lines - 1 do
 		api.nvim_buf_set_extmark(s.buf, ns, row, 0, { end_col = #lines[row + 1], hl_group = "Comment" })
 	end
