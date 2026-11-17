@@ -16,6 +16,22 @@ end
 local function text()
 	return table.concat(api.nvim_buf_get_lines(0, 0, -1, false), "\n")
 end
+local function expect_preview(expected)
+	local calendar_win = api.nvim_get_current_win()
+	assert(
+		vim.wait(1000, function()
+			for _, win in ipairs(api.nvim_tabpage_list_wins(0)) do
+				local config = api.nvim_win_get_config(win)
+				if config.relative == "win" and config.win == calendar_win then
+					local lines = api.nvim_buf_get_lines(api.nvim_win_get_buf(win), 0, -1, false)
+					return table.concat(lines, "\n"):find(expected, 1, true) ~= nil
+				end
+			end
+			return false
+		end),
+		"Expected preview " .. expected
+	)
+end
 local function selected(date)
 	assert(text():find("  " .. date .. " ·", 1, true), "Expected selection " .. date .. "\n" .. text())
 end
@@ -59,7 +75,7 @@ local ok, err = xpcall(function()
 	vim.fn.writefile({ "# A real entry", "Some thoughts" }, wiki.daily_path("2024-02-29"))
 	vim.fn.writefile({ "# Next" }, wiki.daily_path("2024-03-04"))
 	open("2024-02-29")
-	assert(text():find("# A real entry", 1, true))
+	expect_preview("# A real entry")
 	assert(text():find("29*", 1, true))
 	key("n")
 	selected("2024-03-04")
@@ -70,7 +86,7 @@ local ok, err = xpcall(function()
 	api.nvim_buf_set_lines(0, 0, -1, false, { "# Unsaved preview" })
 	calendar.open()
 	selected("2024-02-29")
-	assert(text():find("# Unsaved preview", 1, true))
+	expect_preview("# Unsaved preview")
 	key("q")
 	assert(vim.bo.modified and api.nvim_get_current_line() == "# Unsaved preview")
 	open("2024-02-28")

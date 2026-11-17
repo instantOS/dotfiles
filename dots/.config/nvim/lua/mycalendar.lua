@@ -3,6 +3,9 @@
 local M = {}
 local api = vim.api
 local ns = api.nvim_create_namespace("mycalendar")
+local month_height = 9
+local day_grid_indent = 2
+local day_cell_width = 5
 local active
 
 local function stamp(year, month, day)
@@ -37,20 +40,102 @@ local function move_month(ts, months)
 	return stamp(first.year, first.month, math.min(d.day, last))
 end
 
-local function geometry()
-	local width = math.min(120, vim.o.columns - 4)
-	local height = math.min(40, vim.o.lines - vim.o.cmdheight - 4)
+local function geometry(title)
+	-- The rounded border takes one cell on each side.
+	local width = vim.o.columns - 2
+	local height = vim.o.lines - vim.o.cmdheight - 2
+	if width < 38 or height < 20 then
+		return nil
+	end
 	return {
 		relative = "editor",
 		width = width,
 		height = height,
-		row = math.max(0, math.floor((vim.o.lines - vim.o.cmdheight - height - 2) / 2)),
-		col = math.max(0, math.floor((vim.o.columns - width - 2) / 2)),
+		row = 0,
+		col = 0,
 		style = "minimal",
 		border = "rounded",
-		title = " Diary calendar ",
+		title = title,
 		title_pos = "center",
 	}
+end
+
+local bindings = {
+	{ "h/l, ←/→", "Previous/next day" },
+	{ "k/j, ↑/↓", "Previous/next week" },
+	{ "[ / ]", "Previous/next month" },
+	{ "{ / }", "Previous/next year" },
+	{ "Ctrl-u/d", "Browse past/future" },
+	{ "t", "Jump to today" },
+	{ "g", "Go to date" },
+	{ "p/n", "Previous/next note" },
+	{ "Ctrl-y/e", "Preview up/down" },
+	{ "Mouse wheel", "Scroll preview" },
+	{ "Left click", "Select day" },
+	{ "Enter", "Open/create note" },
+	{ "Ctrl-s/v/t", "Split/vsplit/tab" },
+	{ "D", "Daily note picker" },
+	{ "q / Esc", "Close active popup" },
+	{ "?", "Toggle this list" },
+}
+
+local function help_config(s)
+	local parent_width = api.nvim_win_get_width(s.win)
+	local width = math.min(48, parent_width - 2)
+	return {
+		relative = "win",
+		win = s.win,
+		width = width,
+		height = #bindings,
+		row = math.floor((api.nvim_win_get_height(s.win) - #bindings - 2) / 2),
+		col = math.floor((parent_width - width - 2) / 2),
+		style = "minimal",
+		border = "rounded",
+		title = " Calendar bindings ",
+		title_pos = "center",
+		zindex = 60,
+	}
+end
+
+local function close_help(s)
+	local win = s.help_win
+	s.help_win = nil
+	if win and api.nvim_win_is_valid(win) then
+		api.nvim_win_close(win, true)
+	end
+end
+
+local function toggle_help(s)
+	if s.help_win and api.nvim_win_is_valid(s.help_win) then
+		close_help(s)
+		return
+	end
+	local buf = api.nvim_create_buf(false, true)
+	vim.bo[buf].bufhidden = "wipe"
+	local lines = {}
+	for _, binding in ipairs(bindings) do
+		local gap = string.rep(" ", 13 - vim.fn.strdisplaywidth(binding[1]))
+		lines[#lines + 1] = " " .. binding[1] .. gap .. binding[2]
+	end
+	api.nvim_buf_set_lines(buf, 0, -1, false, lines)
+	vim.bo[buf].modifiable = false
+	for row, binding in ipairs(bindings) do
+		api.nvim_buf_set_extmark(buf, ns, row - 1, 1, { end_col = 1 + #binding[1], hl_group = "Special" })
+	end
+	for _, key in ipairs({ "?", "q", "<Esc>" }) do
+		vim.keymap.set("n", key, function()
+			close_help(s)
+		end, { buffer = buf, nowait = true, silent = true, desc = "Close calendar bindings" })
+	end
+	s.help_win = api.nvim_open_win(buf, true, help_config(s))
+	vim.wo[s.help_win].wrap = false
+end
+
+local function close_preview(s)
+	if s.preview_win and api.nvim_win_is_valid(s.preview_win) then
+		api.nvim_win_close(s.preview_win, true)
+	end
+	s.preview_win, s.preview_date = nil, nil
 end
 
 local function close()
@@ -59,6 +144,8 @@ local function close()
 	if not s then
 		return
 	end
+	close_help(s)
+	close_preview(s)
 	if api.nvim_win_is_valid(s.win) then
 		api.nvim_win_close(s.win, true)
 	end
@@ -68,150 +155,243 @@ local function close()
 end
 
 local function refresh(s)
-	s.dates = require("mywiki").daily_dates()
+	local wiki = require("mywiki")
+	local dir = vim.fs.dirname(wiki.daily_path("2000-01-01"))
+	local stat = vim.uv.fs_stat(dir)
+	local previous = s.diary_stat
+	-- Reuse the filename index while the same directory is unchanged.
+	if
+		not stat
+		or not previous
+		or s.diary_dir ~= dir
+		or stat.dev ~= previous.dev
+		or stat.ino ~= previous.ino
+		or stat.mtime.sec ~= previous.mtime.sec
+		or stat.mtime.nsec ~= previous.mtime.nsec
+	then
+		s.disk_dates = wiki.daily_dates()
+		s.diary_dir, s.diary_stat = dir, stat
+	end
+	s.dates = s.disk_dates
 	s.notes = {}
 	for _, date in ipairs(s.dates) do
 		s.notes[date] = true
 	end
 	-- Include unsaved daily notes in the markers and preview.
-	local dir = vim.fs.dirname(require("mywiki").daily_path("2000-01-01"))
 	for _, buf in ipairs(api.nvim_list_bufs()) do
 		if api.nvim_buf_is_loaded(buf) then
 			local path = api.nvim_buf_get_name(buf)
 			local date = vim.fs.basename(path):match("^(%d%d%d%d%-%d%d%-%d%d)%.md$")
 			if date and vim.fs.dirname(path) == dir then
 				if not s.notes[date] then
+					if s.dates == s.disk_dates then
+						s.dates = vim.list_extend({}, s.disk_dates)
+					end
 					s.dates[#s.dates + 1] = date
 				end
 				s.notes[date] = true
 			end
 		end
 	end
-	table.sort(s.dates)
+	if s.dates ~= s.disk_dates then
+		table.sort(s.dates)
+	end
 end
 
-local function preview(date, limit)
-	if limit == 0 then
-		return {}
-	end
+local function read_preview(date)
 	local path = require("mywiki").daily_path(date)
 	local buf = vim.fn.bufnr(path)
 	if buf >= 0 and api.nvim_buf_is_loaded(buf) then
-		return api.nvim_buf_get_lines(buf, 0, math.min(limit, api.nvim_buf_line_count(buf)), false)
+		return api.nvim_buf_get_lines(buf, 0, -1, false)
 	end
-	local ok, lines = pcall(vim.fn.readfile, path, "", limit)
-	return ok and lines or { "No note yet. Press Enter to start this day." }
+	local ok, lines = pcall(vim.fn.readfile, path)
+	return ok and lines or nil
 end
 
-local function preview_rows(date, height, width)
-	local rows = {}
-	for _, line in ipairs(preview(date, height)) do
-		line = line:gsub("\t", "  "):gsub("%c", " ")
-		if vim.fn.strdisplaywidth(line) > width then
-			local chunk = ""
-			for _, char in ipairs(vim.fn.split(line, [[\zs]])) do
-				if vim.fn.strdisplaywidth(chunk .. char) > width then
-					rows[#rows + 1] = chunk
-					if #rows == height then
-						return rows
-					end
-					chunk = ""
-				end
-				chunk = chunk .. char
-			end
-			line = chunk
-		end
-		rows[#rows + 1] = line
-		if #rows == height then
-			break
+local function highlight_preview(buf, lines)
+	-- Use bounded regex highlighting for large or unusually long-line notes.
+	-- Tree-sitter queries on these inputs can make preview redraws stall.
+	local size = 0
+	for _, line in ipairs(lines) do
+		size = size + #line + 1
+		if size > 512 * 1024 or #line > 16 * 1024 then
+			vim.bo[buf].synmaxcol = 3000
+			vim.bo[buf].syntax = "markdown"
+			return
 		end
 	end
-	return rows
+	if not pcall(vim.treesitter.start, buf, "markdown") then
+		vim.bo[buf].syntax = "markdown"
+	end
 end
 
-local function render(s)
-	if active ~= s or not api.nvim_win_is_valid(s.win) then
+local function show_preview(s, date, row, col, width, height, reload)
+	if height < 1 then
+		close_preview(s)
 		return
 	end
-	local d = os.date("*t", s.selected)
-	local first = os.date("*t", stamp(d.year, d.month, 1))
-	local offset = (first.wday + 5) % 7 -- Monday first.
-	local days = os.date("*t", stamp(d.year, d.month + 1, 0)).day
-	local date = date_of(s.selected)
-	local width = api.nvim_win_get_width(s.win)
-	local function separator(label)
-		local prefix = "  ── " .. label .. " "
-		return prefix .. string.rep("─", math.max(0, width - vim.fn.strdisplaywidth(prefix) - 2))
+	local config = {
+		relative = "win",
+		win = s.win,
+		row = row,
+		col = col,
+		width = width,
+		height = height,
+		border = "none",
+		style = "minimal",
+		focusable = false,
+		zindex = 51,
+	}
+	local visible = s.preview_win and api.nvim_win_is_valid(s.preview_win)
+	if visible then
+		api.nvim_win_set_config(s.preview_win, config)
+		if s.preview_date == date and not reload then
+			return
+		end
 	end
-	local lines = { "  " .. os.date("%B %Y", s.selected), "", "  Mo   Tu   We   Th   Fr   Sa   Su" }
-	local marks = {}
-	local selected_row, selected_col
+	s.preview_date = date
+	local buf = api.nvim_create_buf(false, true)
+	vim.bo[buf].bufhidden = "wipe"
+	vim.bo[buf].modifiable = false
+	if visible then
+		api.nvim_win_set_buf(s.preview_win, buf)
+	else
+		s.preview_win = api.nvim_open_win(buf, false, config)
+		local opts = vim.wo[s.preview_win]
+		opts.wrap = true
+		opts.linebreak = true
+		opts.smoothscroll = true
+		opts.foldenable = false
+		opts.scrolloff = 0
+		opts.conceallevel = 0
+	end
+	local win = s.preview_win
+	-- Skip notes passed over while navigating.
+	vim.defer_fn(function()
+		if active ~= s or not api.nvim_win_is_valid(win) or api.nvim_win_get_buf(win) ~= buf then
+			return
+		end
+		local lines = read_preview(date)
+		vim.bo[buf].modifiable = true
+		api.nvim_buf_set_lines(buf, 0, -1, false, lines or { "No note yet. Press Enter to start this day." })
+		vim.bo[buf].modifiable = false
+		if lines then
+			highlight_preview(buf, lines)
+		end
+	end, 75)
+end
+
+local function render_month(s, lines, marks, month, date, today)
+	local year = math.floor(month / 12)
+	local month_of_year = month % 12 + 1
+	local start = stamp(year, month_of_year, 1)
+	local first = os.date("*t", start)
+	local offset = (first.wday + 5) % 7 -- Monday first.
+	local days = os.date("*t", stamp(year, month_of_year + 1, 0)).day
+	local title = "  " .. os.date("%B %Y", start)
+	marks[#marks + 1] = { #lines, 2, #title, "Title" }
+	lines[#lines + 1] = title
+	lines[#lines + 1] = "  Mo   Tu   We   Th   Fr   Sa   Su"
+	local cursor
 	for week = 0, 5 do
 		local cells = {}
+		local week_dates = {}
+		s.day_rows[#lines + 1] = week_dates
 		for weekday = 0, 6 do
 			local day = week * 7 + weekday - offset + 1
 			local cell = "    "
 			if day >= 1 and day <= days then
-				local key = ("%04d-%02d-%02d"):format(d.year, d.month, day)
+				local key = ("%04d-%02d-%02d"):format(year, month_of_year, day)
+				week_dates[weekday + 1] = key
 				cell = ("%2d%s "):format(day, s.notes[key] and "*" or " ")
-				local col = 2 + weekday * 5
-				local hl = key == os.date("%Y-%m-%d") and "MyCalendarToday"
-					or s.notes[key] and "MyCalendarNote"
-					or "NormalFloat"
+				local col = day_grid_indent + weekday * day_cell_width
+				local hl = key == today and "MyCalendarToday" or s.notes[key] and "MyCalendarNote" or "NormalFloat"
 				if key == date then
 					hl = "MyCalendarSelected"
-					selected_row, selected_col = #lines + 1, col
+					cursor = { #lines + 1, col }
 				end
 				marks[#marks + 1] = { #lines, col, col + 3, hl }
 			end
 			cells[#cells + 1] = cell
 		end
-		lines[#lines + 1] = "  " .. table.concat(cells, " ")
+		lines[#lines + 1] = string.rep(" ", day_grid_indent) .. table.concat(cells, " ")
 	end
-	vim.list_extend(lines, {
-		"",
-		"  " .. date .. " · " .. os.date("%A", s.selected) .. (s.notes[date] and " · note" or " · new"),
-		"  * diary note    Today: " .. os.date("%Y-%m-%d"),
-	})
-	local footer = {
-		separator("Controls"),
-		"  hjkl/arrows: day/week   [ ]: month   { }: year",
-		"  t: today   g: date   p/n: previous/next note",
-		"  Enter: open   D: daily picker   q/Esc: close",
-		"  Ctrl-s/v/t: open in split / vertical / tab",
-	}
-	local body_height = api.nvim_win_get_height(s.win) - #footer
-	local calendar_title_end = #lines[1]
-	local left_width = 38
+	lines[#lines + 1] = ""
+	return cursor
+end
+
+local function separator(label, width)
+	local prefix = "  ── " .. label .. " "
+	local cells = math.max(0, width - vim.fn.strdisplaywidth(prefix) - 2)
+	return prefix .. string.rep("─", math.floor(cells / vim.fn.strdisplaywidth("─")))
+end
+
+local function footer_hint(width)
+	local hints = { "hjkl Move", "Enter Open", "? Help", "q Close" }
+	local text = table.concat(hints, "  ·  ")
+	if vim.fn.strdisplaywidth(text) > width then
+		text = table.concat(hints, "  ")
+	end
+	return string.rep(" ", math.max(0, math.floor((width - vim.fn.strdisplaywidth(text)) / 2))) .. text
+end
+
+local function render(s, reload_preview)
+	if active ~= s or not api.nvim_win_is_valid(s.win) then
+		return
+	end
+	local selected = os.date("*t", s.selected)
+	local selected_month = selected.year * 12 + selected.month - 1
+	local date = date_of(s.selected)
+	local today = os.date("%Y-%m-%d")
+	local width = api.nvim_win_get_width(s.win)
+	local body_height = api.nvim_win_get_height(s.win) - 1
+	local status = "  " .. date .. " · " .. os.date("%A", s.selected) .. (s.notes[date] and " · note" or " · new")
+	local legend = "  * diary note    Today: " .. today
+	local left_width = math.max(38, vim.fn.strdisplaywidth(status) + 2, vim.fn.strdisplaywidth(legend) + 2)
+	local side_by_side = width - left_width >= 38
+	local month_count = side_by_side and math.max(1, math.floor((body_height - 2) / month_height)) or 1
+	-- Keep the visible months steady until the selection crosses an edge.
+	s.first_month =
+		math.max(selected_month - month_count + 1, math.min(s.first_month or selected_month, selected_month))
+	s.day_rows = {}
+	local lines, marks = {}, {}
+	local cursor
+	for month = s.first_month, s.first_month + month_count - 1 do
+		cursor = render_month(s, lines, marks, month, date, today) or cursor
+	end
+	lines[#lines + 1] = status
+	lines[#lines + 1] = legend
 	for _, line in ipairs(lines) do
 		left_width = math.max(left_width, vim.fn.strdisplaywidth(line) + 2)
 	end
-	local preview_heading_col
-	if width - left_width >= 38 then
+	local preview_heading = s.preview_icon .. "Note preview"
+	local preview_row, preview_col
+	if side_by_side then
 		local divider = "│  "
-		local right = { "Note preview", "" }
-		vim.list_extend(right, preview_rows(date, body_height - #right, width - left_width - 5))
+		preview_row = 2
+		preview_col = left_width + vim.fn.strdisplaywidth(divider)
 		for row = 1, body_height do
 			local left = lines[row] or ""
 			left = left .. string.rep(" ", left_width - vim.fn.strdisplaywidth(left))
-			lines[row] = left .. divider .. (right[row] or "")
+			lines[row] = left .. divider
 			marks[#marks + 1] = { row - 1, #left, #left + #"│", "Comment" }
 			if row == 1 then
-				preview_heading_col = #left + #divider
+				lines[row] = lines[row] .. preview_heading
+				marks[#marks + 1] = { 0, #left + #divider, #lines[row], "Title" }
 			end
 		end
 	else
-		lines[#lines + 1] = separator("Note preview")
-		local preview_height = math.max(0, body_height - #lines)
-		for _, line in ipairs(preview_rows(date, preview_height, width - 4)) do
-			lines[#lines + 1] = "  " .. line
-		end
+		local heading = separator(preview_heading, width)
+		marks[#marks + 1] = { #lines, 0, #heading, "Comment" }
+		lines[#lines + 1] = heading
+		preview_row, preview_col = #lines, 2
 		while #lines < body_height do
 			lines[#lines + 1] = ""
 		end
 	end
-	local footer_start = #lines
-	vim.list_extend(lines, footer)
+	local hint = footer_hint(width)
+	marks[#marks + 1] = { #lines, 0, #hint, "Comment" }
+	lines[#lines + 1] = hint
 	vim.bo[s.buf].modifiable = true
 	api.nvim_buf_set_lines(s.buf, 0, -1, false, lines)
 	vim.bo[s.buf].modifiable = false
@@ -222,42 +402,12 @@ local function render(s)
 			hl_group = mark[4],
 		})
 	end
-	api.nvim_buf_set_extmark(s.buf, ns, 0, 2, { end_col = calendar_title_end, hl_group = "Title" })
-	if preview_heading_col then
-		api.nvim_buf_set_extmark(s.buf, ns, 0, preview_heading_col, { end_col = #lines[1], hl_group = "Title" })
-	else
-		api.nvim_buf_set_extmark(s.buf, ns, 12, 0, { end_col = #lines[13], hl_group = "Comment" })
-	end
-	for row = footer_start, #lines - 1 do
-		api.nvim_buf_set_extmark(s.buf, ns, row, 0, { end_col = #lines[row + 1], hl_group = "Comment" })
-	end
-	for i, keys in ipairs({
-		{ "hjkl/arrows", "[ ]", "{ }" },
-		{ "t", "g", "p/n" },
-		{ "Enter", "D", "q/Esc" },
-		{ "Ctrl-s/v/t" },
-	}) do
-		local row = footer_start + i
-		local start = 1
-		for _, key in ipairs(keys) do
-			local first, last = lines[row + 1]:find(key .. ":", start, true)
-			if first then
-				api.nvim_buf_set_extmark(
-					s.buf,
-					ns,
-					row,
-					first - 1,
-					{ end_col = last - 1, hl_group = "Special", priority = 110 }
-				)
-				start = last + 1
-			end
-		end
-	end
-	api.nvim_win_set_cursor(s.win, { selected_row, selected_col })
+	api.nvim_win_set_cursor(s.win, cursor)
 	-- Keep the month header visible even on a shorter terminal.
 	api.nvim_win_call(s.win, function()
 		vim.fn.winrestview({ topline = 1 })
 	end)
+	show_preview(s, date, preview_row, preview_col, width - preview_col - 2, body_height - preview_row, reload_preview)
 end
 
 local function open_note(s, layout)
@@ -286,24 +436,35 @@ function M.open(date)
 		return
 	end
 	if active and api.nvim_win_is_valid(active.win) then
+		close_help(active)
 		api.nvim_set_current_win(active.win)
 		active.selected = selected or active.selected
 		refresh(active)
-		render(active)
+		render(active, true)
 		return
 	end
-	if vim.o.columns < 40 or vim.o.lines < 23 then
-		vim.notify("Calendar needs at least 40 columns and 23 lines", vim.log.levels.WARN)
+	local title, preview_icon = " Diary calendar ", ""
+	local icons = _G.MiniIcons
+	if icons and icons.config.style == "glyph" then
+		title = "   Diary calendar "
+		preview_icon = icons.get("filetype", "markdown") .. " "
+	end
+	local config = geometry(title)
+	if not config then
+		vim.notify("Calendar needs at least 40 columns and 22 lines above the command line", vim.log.levels.WARN)
 		return
 	end
 	local current = api.nvim_buf_get_name(0)
 	local note_date = vim.fs.basename(current):match("^(%d%d%d%d%-%d%d%-%d%d)%.md$")
-	local s =
-		{ origin = api.nvim_get_current_win(), selected = selected or parse(note_date) or parse(os.date("%Y-%m-%d")) }
+	local s = {
+		origin = api.nvim_get_current_win(),
+		selected = selected or parse(note_date) or parse(os.date("%Y-%m-%d")),
+		preview_icon = preview_icon,
+	}
 	s.buf = api.nvim_create_buf(false, true)
 	vim.bo[s.buf].bufhidden = "wipe"
 	vim.bo[s.buf].filetype = "diarycalendar"
-	s.win = api.nvim_open_win(s.buf, true, geometry())
+	s.win = api.nvim_open_win(s.buf, true, config)
 	active = s
 	vim.wo[s.win].wrap = false
 	vim.wo[s.win].cursorline = false
@@ -315,6 +476,20 @@ function M.open(date)
 			vim.keymap.set("n", key, action, { buffer = s.buf, nowait = true, silent = true, desc = desc })
 		end
 	end
+	map("<LeftMouse>", function()
+		local mouse = vim.fn.getmousepos()
+		if mouse.winid ~= s.win then
+			api.nvim_feedkeys(vim.keycode("<LeftMouse>"), "n", false)
+			return
+		end
+		local col = mouse.column - 1 - day_grid_indent
+		local week = s.day_rows[mouse.line]
+		local date = week and week[math.floor(col / day_cell_width) + 1]
+		if date and date ~= date_of(s.selected) then
+			s.selected = parse(date)
+			render(s)
+		end
+	end, "Select calendar day")
 	for key, days in pairs({
 		h = -1,
 		l = 1,
@@ -336,21 +511,52 @@ function M.open(date)
 			render(s)
 		end, "Move by month/year")
 	end
+	for key, direction in pairs({ ["<C-u>"] = -1, ["<C-d>"] = 1 }) do
+		map(key, function()
+			local months = direction * vim.v.count1
+			s.first_month = s.first_month + months
+			s.selected = move_month(s.selected, months)
+			render(s)
+		end, "Scroll by month")
+	end
+	for key, scroll in pairs({
+		["<C-y>"] = "<C-y>",
+		["<C-e>"] = "<C-e>",
+		["<ScrollWheelUp>"] = "<C-y>",
+		["<ScrollWheelDown>"] = "<C-e>",
+	}) do
+		map(key, function()
+			if not s.preview_win or not api.nvim_win_is_valid(s.preview_win) then
+				return
+			end
+			local mouse = key:find("Wheel", 1, true)
+			if mouse and vim.fn.getmousepos().winid ~= s.win then
+				return
+			end
+			local keys = (vim.v.count1 * (mouse and 3 or 1)) .. vim.keycode(scroll)
+			api.nvim_win_call(s.preview_win, function()
+				vim.cmd.normal({ args = { keys }, bang = true })
+			end)
+		end, "Scroll note preview")
+	end
 	for key, direction in pairs({ p = -1, n = 1 }) do
 		map(key, function()
 			refresh(s)
 			local current_date = date_of(s.selected)
 			local candidate
-			for _, entry in ipairs(s.dates) do
-				if direction == 1 and entry > current_date and parse(entry) then
-					candidate = entry
-					break
-				elseif direction == -1 and entry < current_date and parse(entry) then
-					candidate = entry
+			local first = direction == 1 and 1 or #s.dates
+			local last = direction == 1 and #s.dates or 1
+			for i = first, last, direction do
+				local entry = s.dates[i]
+				if (direction == 1 and entry > current_date) or (direction == -1 and entry < current_date) then
+					candidate = parse(entry)
+					if candidate then
+						break
+					end
 				end
 			end
 			if candidate then
-				s.selected = parse(candidate)
+				s.selected = candidate
 			else
 				vim.notify("Calendar: no " .. (direction == 1 and "later" or "earlier") .. " diary note")
 			end
@@ -388,17 +594,23 @@ function M.open(date)
 		close()
 		require("mywiki").dailies()
 	end, "Daily note picker")
+	map("?", function()
+		toggle_help(s)
+	end, "Show calendar bindings")
 	map({ "q", "<Esc>" }, close, "Close calendar")
-	api.nvim_create_autocmd("VimResized", {
-		buffer = s.buf,
+	local resize = api.nvim_create_autocmd("VimResized", {
 		callback = function()
 			if active == s then
-				if vim.o.columns < 40 or vim.o.lines < 23 then
+				local resized = geometry(title)
+				if not resized then
 					close()
 					return
 				end
-				api.nvim_win_set_config(s.win, geometry())
+				api.nvim_win_set_config(s.win, resized)
 				render(s)
+				if s.help_win and api.nvim_win_is_valid(s.help_win) then
+					api.nvim_win_set_config(s.help_win, help_config(s))
+				end
 			end
 		end,
 	})
@@ -406,6 +618,9 @@ function M.open(date)
 		buffer = s.buf,
 		once = true,
 		callback = function()
+			api.nvim_del_autocmd(resize)
+			close_help(s)
+			close_preview(s)
 			if active == s then
 				active = nil
 			end
